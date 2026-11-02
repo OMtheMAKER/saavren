@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="hi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0f1226" />
+    <meta name="description" content="A calm daily companion for older adults - check-ins, medicines and family, in nine languages." />
+    <link rel="icon" href="./favicon-32.png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Saavren" />
+    <title>Saavren — Akela nahi</title>
+    <script type="module" crossorigin src="/assets/index-BNhfGNsV.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-Ccbq13si.css">
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script>
+      // Installable on Android/iOS home screen. Never caches /api calls.
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function () {
+          navigator.serviceWorker.register('./sw.js').catch(function () {})
+        })
+      }
+    </script>
+  </body>
+</html>

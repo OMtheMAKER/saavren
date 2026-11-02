@@ -1,0 +1,67 @@
+name: Android APK
+
+# Builds a real, installable APK around the live web app.
+# You need no Android Studio and no Java on your own machine — GitHub does it.
+#
+# How to run it:
+#   GitHub repo -> Actions -> "Android APK" -> Run workflow
+#   -> paste your live URL -> wait ~8 minutes -> download the APK artifact.
+
+on:
+  workflow_dispatch:
+    inputs:
+      app_url:
+        description: 'Live URL of the deployed app'
+        required: true
+        default: 'https://REPLACE-ME.hf.space'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Build the web app
+        working-directory: frontend
+        run: |
+          npm install --no-audit --no-fund
+          npx vite build
+
+      - name: Wrap it with Capacitor
+        env:
+          APP_URL: ${{ github.event.inputs.app_url }}
+        run: |
+          npm init -y >/dev/null
+          npm install --no-audit --no-fund @capacitor/core @capacitor/cli @capacitor/android
+          npx cap init "Saavren" "com.saavren.app" --web-dir=frontend/dist
+          python3 - <<'PY'
+          import json, os
+          cfg = json.load(open('mobile/capacitor.config.json'))
+          cfg['server']['url'] = os.environ['APP_URL'].strip().rstrip('/')
+          json.dump(cfg, open('capacitor.config.json','w'), indent=2)
+          print('APK will open:', cfg['server']['url'])
+          PY
+          npx cap add android
+          npx cap sync android
+          python3 mobile/add_permissions.py android/app/src/main/AndroidManifest.xml
+
+      - name: Build the APK
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: saavren-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error

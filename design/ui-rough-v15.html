@@ -1,0 +1,1367 @@
+<!doctype html>
+<html data-theme="dark">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Saavren — rough v1.5</title>
+<style>
+  html[data-theme="dark"]{
+    --bg:#20242b; --bg2:#2b3038; --card:#393f48; --line:#4b515b;
+    --text:#e8eaee; --muted:#9aa1ab; --accent:#8b939e; --accent2:#c8ced7;
+    --btn:#565d68; --ok:#3ddc84;
+  }
+  html[data-theme="light"]{
+    --bg:#e9f6f4; --bg2:#ffffff; --card:#ffffff; --line:#bfe3de;
+    --text:#0f3a36; --muted:#4f7b76; --accent:#0d9488; --accent2:#14b8a6;
+    --btn:#0d9488; --ok:#0f766e;
+  }
+  *{margin:0;box-sizing:border-box;font-family:'Segoe UI',system-ui,sans-serif}
+  body{background:var(--bg);color:var(--text);min-height:100vh;transition:.25s}
+
+  .controls{position:fixed;top:18px;left:18px;display:flex;gap:10px;align-items:center;z-index:9;flex-wrap:wrap}
+  .toggle{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:8px 14px;cursor:pointer}
+  .toggle .knob{width:34px;height:18px;border-radius:999px;background:var(--accent);position:relative;transition:.25s}
+  .toggle .knob::after{content:'';position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:var(--bg2);transition:.25s}
+  html[data-theme="light"] .toggle .knob::after{left:18px}
+  .toggle span,.langsel{font-size:13px;color:var(--muted)}
+  .langsel{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:9px 12px;color:var(--text)}
+
+  .center{min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:90px 24px 40px}
+  .logo{font-size:44px;font-weight:900}
+  .logo em{font-style:normal;color:var(--accent)}
+  .tagline{color:var(--muted);margin:6px 0 34px;font-size:16px}
+  .tagline b{color:var(--accent2)}
+  .roles{display:flex;flex-direction:column;gap:20px;width:100%;max-width:480px}
+  .role{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:28px 22px;text-align:center;transition:.2s;cursor:pointer}
+  .role:hover{transform:translateY(-4px);border-color:var(--accent)}
+  .role .icon{font-size:52px;display:block;margin-bottom:12px}
+  .role h2{font-size:22px;margin-bottom:6px}
+  .role p{color:var(--muted);font-size:14px;line-height:1.5;margin-bottom:14px}
+  .btn{background:var(--btn);color:#fff;border:none;border-radius:12px;padding:13px;font-size:16px;font-weight:700;cursor:pointer;width:100%}
+  .btn.ghost{background:transparent;color:var(--accent);border:1px solid var(--accent);margin-top:8px}
+  html[data-theme="dark"] .btn.ghost{color:var(--accent2);border-color:var(--accent2)}
+  .foot{margin-top:34px;color:var(--muted);font-size:13px;text-align:center;line-height:1.6}
+
+  /* page2 */
+  .formwrap{width:100%;max-width:560px;background:var(--card);border:1px solid var(--line);border-radius:22px;padding:26px 24px}
+  .formwrap h2{font-size:24px;margin-bottom:4px}
+  .formwrap .sub{color:var(--muted);font-size:14px;margin-bottom:20px}
+  .fld{margin-bottom:18px}
+  .fld label{display:block;font-size:14px;font-weight:700;margin-bottom:7px}
+  .inp,select.inp,textarea.inp{width:100%;background:var(--bg2);border:1px solid var(--line);color:var(--text);border-radius:12px;padding:12px 14px;font-size:15px}
+  textarea.inp{min-height:64px;resize:vertical}
+  .eg{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.5}
+  .row{display:flex;gap:12px}.row .fld{flex:1}
+  .chips{display:flex;gap:8px;flex-wrap:wrap}
+  .chip{padding:9px 16px;border-radius:999px;border:1px solid var(--line);background:var(--bg2);cursor:pointer;font-size:14px;color:var(--text)}
+  .chip.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+  html[data-theme="dark"] .chip.on{background:var(--accent2);color:#20242b}
+  .opt{font-size:12px;color:var(--muted)}
+
+  .phone{display:flex;gap:8px}
+  .ccode{display:flex;align-items:center;gap:6px;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:0 10px;font-size:15px;white-space:nowrap;flex:0 0 auto}
+  .ccode .flg{font-size:18px}
+  .ccode select{background:transparent;border:none;color:var(--text);font-size:14px;outline:none;cursor:pointer;max-width:170px}
+
+  .detect{display:flex;gap:10px;align-items:center;margin:12px 0}
+  .detect button{background:var(--accent);color:#fff;border:none;border-radius:12px;padding:11px 16px;font-weight:700;cursor:pointer;white-space:nowrap}
+  .detect .st{font-size:12px;color:var(--muted)}
+  .hosp{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px;background:var(--bg2);display:flex;align-items:center;gap:12px}
+  .hosp .pri{width:30px;height:30px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:800;flex:0 0 30px}
+  .hosp .info{flex:1}
+  .hosp .info b{display:block;font-size:14px}
+  .hosp .info span{font-size:12px;color:var(--muted)}
+  .hosp .arrows{display:flex;flex-direction:column;gap:2px}
+  .hosp .arrows button{background:var(--card);border:1px solid var(--line);color:var(--text);border-radius:6px;padding:1px 7px;cursor:pointer;font-size:11px}
+  .tag-auto{font-size:10px;background:var(--ok);color:#08130c;border-radius:6px;padding:2px 7px;font-weight:800;margin-left:6px}
+  .guid{display:flex;gap:10px;align-items:flex-start;margin:20px 0;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:14px}
+  .guid input{margin-top:4px}
+  .guid span{font-size:13px;line-height:1.6;color:var(--muted)}
+  .proceed{width:100%;background:var(--accent);color:#fff;border:none;border-radius:14px;padding:15px;font-size:17px;font-weight:800;cursor:pointer;opacity:.4}
+  .proceed.ready{opacity:1;box-shadow:0 6px 24px rgba(13,148,136,.25)}
+  .back{border:none;background:none;color:var(--muted);font-size:14px;cursor:pointer;margin-bottom:14px;text-align:left}
+  .locked{display:flex;align-items:center;gap:8px;background:var(--bg2);border:1px dashed var(--line);border-radius:12px;padding:12px 14px;font-size:15px;color:var(--text)}
+  .locked .flg{font-size:18px}
+  .lk{margin-left:auto;font-size:11px;color:var(--muted)}
+  .pw{position:relative}
+  .pw .eye{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:var(--muted)}
+  .ltab{display:flex;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:4px;gap:4px;margin-bottom:16px}
+  .ltab button{flex:1;background:none;border:none;color:var(--muted);font-size:14px;font-weight:700;padding:10px;border-radius:9px;cursor:pointer}
+  .ltab button.on{background:var(--accent);color:#fff}
+  html[data-theme="dark"] .ltab button.on{background:var(--accent2);color:#20242b}
+  .otp{display:flex;gap:8px;justify-content:space-between}
+  .otp input{width:46px;height:54px;text-align:center;font-size:22px;font-weight:800;background:var(--bg2);border:1px solid var(--line);color:var(--text);border-radius:12px}
+  .otp input:focus{border-color:var(--accent);outline:none}
+  .link{font-size:13px;color:var(--accent);cursor:pointer;text-align:right;display:block;margin-top:8px;background:none;border:none;width:100%}
+  .sendBtn{width:100%;background:var(--accent);color:#fff;border:none;border-radius:12px;padding:12px;font-weight:700;font-size:15px;cursor:pointer}
+  .invbox{display:flex;align-items:center;gap:8px;background:var(--bg2);border:1px dashed var(--line);border-radius:12px;padding:12px 14px;font-size:17px;font-weight:800;letter-spacing:1px}
+  .invbox span{flex:1}
+  .mini{background:var(--card);border:1px solid var(--line);color:var(--text);border-radius:8px;padding:8px 12px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
+
+  /* page 8 : elder home */
+  .homehead{text-align:center;margin-bottom:28px}
+  .homehead .hi{font-size:32px;font-weight:900}
+  .homehead .hi em{font-style:normal;color:var(--accent)}
+  html[data-theme="dark"] .homehead .hi em{color:var(--accent2)}
+  .sub2{color:var(--muted);margin-top:8px;font-size:15px}
+  .dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--ok);margin-right:7px;box-shadow:0 0 8px var(--ok)}
+  .aibar{display:flex;align-items:center;gap:10px;background:var(--card);border:2px solid var(--accent);border-radius:999px;padding:10px 12px;max-width:560px;width:100%;box-shadow:0 8px 30px rgba(13,148,136,.18);cursor:text}
+  html[data-theme="dark"] .aibar{border-color:var(--accent2);box-shadow:0 8px 30px rgba(0,0,0,.4)}
+  .aibar input{flex:1;background:none;border:none;outline:none;font-size:18px;color:var(--text);padding:8px;min-width:0}
+  .aibar .mic{width:56px;height:56px;border-radius:50%;background:var(--accent);color:#fff;border:none;font-size:24px;cursor:pointer;flex:0 0 56px;display:grid;place-items:center}
+  .aibar .kb{width:48px;height:48px;border-radius:50%;background:var(--bg2);border:1px solid var(--line);color:var(--text);font-size:19px;cursor:pointer;flex:0 0 48px}
+  .aihint{text-align:center;color:var(--muted);font-size:13px;margin-top:12px}
+  .chipsRow{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:14px;max-width:560px}
+  .ask{padding:10px 16px;border-radius:999px;border:1px solid var(--line);background:var(--card);font-size:14px;cursor:pointer;color:var(--text)}
+  .icons{display:grid;grid-template-columns:repeat(2,minmax(140px,180px));gap:16px;margin-top:36px;width:100%;max-width:400px;justify-content:center}
+  .app{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:24px 14px;text-align:center;cursor:pointer;transition:.2s}
+  .app:hover{transform:translateY(-3px);border-color:var(--accent)}
+  .app .ic{font-size:42px;display:block;margin-bottom:8px}
+  .app .lbl{font-size:16px;font-weight:800}
+  .app .sm{font-size:11px;color:var(--muted);margin-top:4px;display:block}
+  .app.sos{background:linear-gradient(135deg,#dc2626,#991b1b);border-color:#7f1d1d;color:#fff}
+  .app.sos .sm{color:#fecaca}
+
+  /* page 9 : full chat + hidden sidebar */
+  .chat{width:100%;max-width:720px;background:var(--card);border:1px solid var(--line);border-radius:22px;padding:20px;height:calc(100vh - 130px);min-height:480px;display:flex;flex-direction:column}
+  .msgs{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:12px;padding:6px 2px}
+  .msg{max-width:82%;padding:14px 18px;border-radius:18px;font-size:16px;line-height:1.55}
+  .msg.ai{background:var(--bg2);border:1px solid var(--line);align-self:flex-start;border-bottom-left-radius:6px}
+  .msg.me{background:var(--accent);color:#fff;align-self:flex-end;border-bottom-right-radius:6px}
+  html[data-theme="dark"] .msg.me{background:var(--accent2);color:#20242b}
+  .chatbar{display:flex;gap:10px;align-items:center;margin-top:14px}
+  .chatbar input{flex:1;background:var(--bg2);border:1px solid var(--line);color:var(--text);border-radius:999px;padding:15px 18px;font-size:16px;outline:none;min-width:0}
+  .cbtn{width:52px;height:52px;border-radius:50%;border:none;background:var(--accent);color:#fff;font-size:20px;cursor:pointer;flex:0 0 52px;display:grid;place-items:center}
+  html[data-theme="dark"] .cbtn{background:var(--accent2);color:#20242b}
+  .edge{position:fixed;left:0;top:50%;transform:translateY(-50%);z-index:20;background:var(--card);border:1px solid var(--line);border-left:none;border-radius:0 12px 12px 0;padding:16px 8px 16px 6px;cursor:pointer;font-size:17px;color:var(--text);user-select:none}
+  .side{position:fixed;left:0;top:0;bottom:0;width:98px;background:var(--bg2);border-right:1px solid var(--line);z-index:19;display:flex;flex-direction:column;align-items:center;gap:12px;padding:96px 8px 20px;transform:translateX(-100%);transition:.25s}
+  .side.open{transform:translateX(0)}
+  .sApp{width:76px;border:1px solid var(--line);background:var(--card);border-radius:16px;padding:12px 4px;text-align:center;cursor:pointer}
+  .sApp .ic{font-size:26px;display:block}
+  .sApp .sm{font-size:10px;color:var(--muted);margin-top:5px;display:block}
+  .sApp.sos{background:linear-gradient(135deg,#dc2626,#991b1b);border-color:#7f1d1d}
+  .sApp.sos .sm{color:#fecaca}
+
+  /* feature panels (interactive overlays) */
+  .ovl{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:30;display:flex;align-items:center;justify-content:center;padding:20px}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:22px;width:100%;max-width:480px;max-height:80vh;overflow-y:auto;color:var(--text)}
+  .phead{display:flex;justify-content:space-between;align-items:center;font-size:19px;font-weight:800;margin-bottom:16px}
+  .hrow{display:flex;gap:10px;margin-bottom:10px}
+  .stat{flex:1;background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:14px;text-align:center}
+  .stat b{font-size:21px;display:block}
+  .stat span{font-size:11px;color:var(--muted)}
+  .mrow{display:flex;align-items:center;gap:12px;background:var(--bg2);border:1px solid var(--line);border-radius:13px;padding:13px;margin-bottom:10px}
+  .mrow .mi{flex:1}
+  .tick{width:36px;height:36px;border-radius:50%;border:2px solid var(--line);background:none;cursor:pointer;font-size:15px;color:var(--muted);flex:0 0 36px}
+  .tick.done{background:var(--ok);border-color:var(--ok);color:#08130c}
+  .fam{display:flex;align-items:center;gap:12px;background:var(--bg2);border:1px solid var(--line);border-radius:13px;padding:13px;margin-bottom:10px}
+  .fam .av{width:42px;height:42px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:800;flex:0 0 42px}
+  html[data-theme="dark"] .fam .av{background:var(--accent2);color:#20242b}
+  .callb{margin-left:auto;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:10px 15px;font-weight:700;cursor:pointer}
+  html[data-theme="dark"] .callb{background:var(--accent2);color:#20242b}
+  .tl{border-left:3px solid var(--line);padding-left:16px;margin:4px 0 6px 8px}
+  .tl .t{position:relative;margin-bottom:16px}
+  .tl .t b{display:block;font-size:14px}
+  .tl .t span{font-size:12px;color:var(--muted)}
+  .tl .t::before{content:'';position:absolute;left:-23px;top:4px;width:9px;height:9px;border-radius:50%;background:var(--accent)}
+  .ecard{border:2px solid var(--accent);border-radius:16px;padding:16px;background:var(--bg2)}
+  .ecard .et{font-weight:800;font-size:16px;margin-bottom:10px}
+  .ecard p{font-size:14px;line-height:2;margin:0}
+  #sosOut{font-size:16px;margin-top:14px;line-height:1.7;min-height:24px}
+
+  /* monitor extras */
+  .app{position:relative}
+  .app.notif{background:linear-gradient(135deg,#f59e0b,#d97706);border-color:#92400e;color:#fff}
+  .app.notif .sm{color:#fef3c7}
+  .badge{position:absolute;top:12px;right:12px;background:#dc2626;color:#fff;border-radius:999px;font-size:11px;font-weight:800;padding:3px 8px}
+  .nrow{display:flex;gap:12px;align-items:flex-start;background:var(--bg2);border:1px solid var(--line);border-radius:13px;padding:13px;margin-bottom:10px;font-size:14px}
+  .nrow.urgent{border-color:#dc2626;background:rgba(220,38,38,.07)}
+  .nrow .ni{font-size:20px}
+  .nrow .mi{flex:1}
+  .uni{width:10px;height:10px;border-radius:50%;background:#dc2626;flex:0 0 10px;margin-top:6px}
+  .sApp.notif{background:linear-gradient(135deg,#f59e0b,#d97706);border-color:#92400e;color:#fff}
+  .sApp.notif .sm{color:#fef3c7}
+
+  /* page 12 : health dashboard */
+  .secT{font-size:12px;font-weight:800;color:var(--muted);letter-spacing:1.5px;margin:22px 0 8px;text-transform:uppercase}
+  .hcard{background:var(--bg2);border:1px solid var(--line);border-radius:16px;padding:16px}
+  .hgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .lbl2{font-size:11px;color:var(--muted);display:block;margin-bottom:5px;font-weight:700}
+  .bmibox{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;text-align:center;display:flex;flex-direction:column;justify-content:center}
+  .bmibox .n{font-size:32px;font-weight:900;line-height:1.1}
+  .pill{display:inline-block;font-size:11px;font-weight:800;border-radius:999px;padding:4px 11px;margin-top:8px}
+  .lb{width:100%;border-collapse:collapse}
+  .lb th{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;text-align:left;padding:8px}
+  .lb td{padding:10px 8px;font-size:14px;border-bottom:1px solid var(--line)}
+  .lb tr:last-child td{border-bottom:none}
+  .lb tr.live td{background:rgba(13,148,136,.08)}
+  .pos{font-weight:900}
+  .pts{font-weight:800;color:var(--accent)}
+  html[data-theme="dark"] .pts{color:var(--accent2)}
+  .pbul{display:flex;gap:10px;font-size:14px;padding:7px 0;border-bottom:1px dashed var(--line)}
+  .pbul:last-child{border-bottom:none}
+  .pbul b{margin-left:auto;color:var(--accent);white-space:nowrap}
+  html[data-theme="dark"] .pbul b{color:var(--accent2)}
+  .prog{height:10px;border-radius:999px;background:var(--card);border:1px solid var(--line);overflow:hidden;margin-top:8px}
+  .prog>div{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--accent),var(--accent2))}
+  .toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;padding:13px 22px;border-radius:999px;font-weight:800;font-size:14px;z-index:40;box-shadow:0 8px 28px rgba(0,0,0,.3)}
+  html[data-theme="dark"] .toast{background:var(--accent2);color:#20242b}
+  .hidden{display:none}
+</style>
+</head>
+<body>
+<div class="controls">
+  <div class="toggle" onclick="toggleTheme()"><div class="knob"></div><span id="tl">dark · grey</span></div>
+  <select id="lang" class="langsel" onchange="setLang(this.value)">
+    <option value="en">🌐 English</option><option value="hi">हिन्दी</option><option value="bn">বাংলা</option>
+    <option value="ta">தமிழ்</option><option value="te">తెలుగు</option><option value="mr">मराठी</option>
+    <option value="gu">ગુજરાતી</option><option value="es">Español</option><option value="fr">Français</option>
+  </select>
+</div>
+
+<!-- ============ PAGE 1 ============ -->
+<div class="center" id="page1">
+  <div class="logo">Saavren<em>.</em></div>
+  <div class="tagline"><b data-i="tag">You are not alone</b></div>
+  <div class="roles">
+    <div class="role">
+      <span class="icon">🧓</span>
+      <h2 data-i="user_t">I am the User</h2>
+      <p data-i="user_p">For elders — one big help button, talk by voice, daily health check-ins</p>
+      <button class="btn" data-i="login" onclick="goUserLogin()">Login</button>
+      <button class="btn ghost" data-i="signup" onclick="goSignup()">New account — Sign up</button>
+    </div>
+    <div class="role">
+      <span class="icon">👨‍👩‍👧</span>
+      <h2 data-i="mon_t">Monitor (Family)</h2>
+      <p data-i="mon_p">Family dashboard — live alerts, health trends, incident reports, from anywhere</p>
+      <button class="btn" data-i="login" onclick="goMonitorLogin()">Login</button>
+      <button class="btn ghost" data-i="signup" onclick="goMonitorSignup()">New account — Sign up</button>
+    </div>
+  </div>
+  <div class="foot" data-i="foot">🛡️ Emergency guardian · ❤️ Daily health companion · Meta Global AI Hackathon 2026</div>
+</div>
+
+<!-- ============ PAGE 2 : USER SIGN-UP ============ -->
+<div class="center hidden" id="page2">
+  <div class="formwrap">
+    <button class="back" onclick="goBack()">← back</button>
+    <h2>🧓 Elder account — Sign up</h2>
+    <div class="sub">Basic details · about 2 minutes</div>
+
+    <!-- 1 NAME -->
+    <div class="fld"><label>1. Full name</label>
+      <input class="inp" id="fName" placeholder="Full name">
+      <div class="eg">e.g. Mohan Lal Verma</div></div>
+
+    <!-- 2 AGE + 3 GENDER -->
+    <div class="row">
+      <div class="fld"><label>2. Age</label><input class="inp" type="number" min="40" max="120" placeholder="Age">
+        <div class="eg">e.g. 72</div></div>
+      <div class="fld"><label>3. Gender</label>
+        <div class="chips"><button class="chip on">Male</button><button class="chip">Female</button><button class="chip">Other</button></div></div>
+    </div>
+
+    <!-- 4 LOCATION -->
+    <div class="fld"><label>4. Location & nearby hospitals</label>
+      <select class="inp" id="country" onchange="onCountry()"><option value="">Country…</option></select>
+      <div class="row" style="margin-top:10px">
+        <select class="inp hidden" id="state" onchange="fillCities()"><option value="">State…</option></select>
+        <input class="inp hidden" id="stateT" placeholder="Type your state / province">
+      </div>
+      <div class="row" style="margin-top:10px">
+        <select class="inp hidden" id="city"><option value="">City…</option></select>
+        <input class="inp hidden" id="cityT" placeholder="Type your city">
+        <input class="inp" id="pin" placeholder="Pincode / ZIP">
+      </div>
+      <div class="eg" id="locnote">Every country is listed above. India is fully covered (all states &amp; major cities); the real app ships the complete world database via API — other countries use manual typing in this rough version.</div>
+
+      <div class="detect">
+        <button onclick="detectMe()">📍 Detect my location</button>
+        <div class="st" id="detectst">Auto-fills area and picks the 3 nearest hospitals by distance.</div>
+      </div>
+
+      <div id="hosplist">
+        <div class="hosp"><div class="pri">1</div><div class="info"><b>Balrampur Hospital<span class="tag-auto">AUTO</span></b><span>1.2 km · ~4 min</span></div><div class="arrows"><button>▲</button><button>▼</button></div></div>
+        <div class="hosp"><div class="pri">2</div><div class="info"><b>Civil Hospital Hazratganj<span class="tag-auto">AUTO</span></b><span>2.8 km · ~9 min</span></div><div class="arrows"><button>▲</button><button>▼</button></div></div>
+        <div class="hosp"><div class="pri">3</div><div class="info"><b>KGMU Lucknow<span class="tag-auto">AUTO</span></b><span>4.1 km · ~14 min</span></div><div class="arrows"><button>▲</button><button>▼</button></div></div>
+        <div class="hosp"><div class="pri">4</div><div class="info"><input class="inp" placeholder="Add a 4th hospital yourself (optional)"></div><div class="arrows"><button>▲</button><button>▼</button></div></div>
+      </div>
+      <div class="eg">Use ▲▼ to re-order priorities any time. Auto picks are sorted by distance; slot 4 is yours.</div>
+    </div>
+
+    <!-- 5 OWN CONTACT -->
+    <div class="fld"><label>5. Your contacts</label>
+      <div class="phone">
+        <div class="ccode"><span class="flg" id="flagme">🇮🇳</span><select id="dialme" onchange="upd(this,'flagme')"></select></div>
+        <input class="inp" id="fPhone" placeholder="Phone number">
+      </div>
+      <input class="inp" style="margin-top:10px" id="fEmail" placeholder="Email">
+      <div class="eg">Country code &amp; flag auto-set from your location — you can still pick any other country here and its flag &amp; code update instantly.</div>
+    </div>
+
+    <!-- 6 INVITE FAMILY — code OR link (dono mein se koi ek) -->
+    <div class="fld"><label>6. Invite a monitor (family) <span class="opt">— optional</span></label>
+      <div class="ltab" style="margin-bottom:10px">
+        <button id="iCode" class="on" onclick="setInviteMode('code')">🔑 Via code</button>
+        <button id="iLink" onclick="setInviteMode('link')">🔗 Via link</button>
+      </div>
+
+      <div id="invCode">
+        <div class="invbox"><span id="icodeTxt">SVN-8F2K</span><button class="mini" onclick="regenCode()">↻ New</button><button class="mini" onclick="copyTxt('icodeTxt',this)">Copy</button></div>
+        <div class="eg">Share this code — your family enters it in their own sign-up, field 4. One-time use.</div>
+      </div>
+
+      <div id="invLink" class="hidden">
+        <div class="invbox"><span id="ilinkTxt">saavren.app/join/SVN-8F2K</span><button class="mini" onclick="copyTxt('ilinkTxt',this)">Copy</button></div>
+        <div class="eg">Send this link on WhatsApp / SMS — opening it takes family straight to sign-up with you pre-linked.</div>
+      </div>
+
+      <div class="eg" style="margin-top:8px">No family to invite right now? Skip — “Invite family” stays available later under Settings.</div>
+    </div>
+
+    <!-- 7 MEDICAL -->
+    <div class="fld"><label>7. Existing medical conditions <span class="opt">— optional</span></label>
+      <input class="inp" placeholder="Type any conditions you have">
+      <div class="eg">e.g. Diabetes, High BP, Heart condition, Asthma. Add medicines &amp; doctor details in one line if you like. Leave blank if none.</div>
+    </div>
+
+    <!-- 8 GUIDELINES -->
+    <div class="guid">
+      <input type="checkbox" id="gd" onchange="readyCheck()">
+      <span>I understand Saavren is an <b>emergency-assistance tool, not a medical device</b>, and is not a replacement for doctors or ambulances. I agree to the guidelines &amp; privacy terms.</span>
+    </div>
+    <button class="proceed" id="proceed" onclick="goSetPass()">Proceed →</button>
+  </div>
+</div>
+
+<!-- ============ PAGE 3 : CREATE PASSWORD ============ -->
+<div class="center hidden" id="page3">
+  <div class="formwrap">
+    <button class="back" onclick="goBack3()">← back</button>
+    <h2>🔐 Create your password</h2>
+    <div class="sub">Last step · these are your login details</div>
+
+    <div class="fld"><label>Phone number</label>
+      <div class="locked"><span class="flg" id="sFlag">🇮🇳</span><span id="sPhone">—</span><span class="lk">your login ID</span></div>
+      <div class="eg">Pulled from the details page — to change it, go back and edit field 5.</div></div>
+
+    <div class="fld"><label>Email</label>
+      <div class="locked"><span id="sEmail">—</span><span class="lk">password resets go here</span></div></div>
+
+    <div class="fld"><label>Create password</label>
+      <div class="pw"><input class="inp" type="password" id="pw1" placeholder="New password"><button class="eye" onclick="togglePw()">👁</button></div>
+      <div class="eg">At least 8 characters — mix of letters &amp; numbers.</div></div>
+
+    <div class="fld"><label>Confirm password</label>
+      <div class="pw"><input class="inp" type="password" id="pw2" placeholder="Retype password"></div>
+      <div class="eg" id="pwmsg">Retype the same password.</div></div>
+
+    <button class="proceed" id="create" onclick="createAccount()">Create account →</button>
+  </div>
+</div>
+
+<!-- ============ PAGE 4 : USER LOGIN ============ -->
+<div class="center hidden" id="page4">
+  <div class="formwrap">
+    <button class="back" onclick="goBack4()">← back</button>
+    <h2>🧓 User login</h2>
+    <div class="sub">Welcome back</div>
+
+    <div class="fld"><label>Registered email or phone</label>
+      <input class="inp" id="liId" placeholder="Email or phone number">
+      <div class="eg">e.g. mohan.verma@gmail.com or +91 98765 43210 — the one from your account</div></div>
+
+    <div class="ltab">
+      <button id="tabPw" class="on" onclick="setLMode('pw')">🔑 Password</button>
+      <button id="tabOtp" onclick="setLMode('otp')">📨 OTP</button>
+    </div>
+
+    <div id="lPw">
+      <div class="fld"><label>Password</label>
+        <div class="pw"><input class="inp" type="password" id="lpw" placeholder="Your password"><button class="eye" onclick="toggleLp()">👁</button></div>
+      </div>
+      <button class="link" onclick="alert('Reset link sent to your registered email (demo)')">Forgot password?</button>
+    </div>
+
+    <div id="lOtp" class="hidden">
+      <div class="fld"><label>One-time password (OTP)</label>
+        <button class="sendBtn" onclick="sendOtp()">Send OTP →</button>
+        <div class="eg">Sent to your registered phone via SMS &amp; email. Valid for 5 minutes.</div>
+      </div>
+      <div class="fld"><div class="otp">
+        <input maxlength="1" inputmode="numeric"><input maxlength="1" inputmode="numeric"><input maxlength="1" inputmode="numeric"><input maxlength="1" inputmode="numeric"><input maxlength="1" inputmode="numeric"><input maxlength="1" inputmode="numeric">
+      </div><div class="eg" id="otpst">Enter the 6-digit code.</div></div>
+    </div>
+
+    <div class="guid">
+      <input type="checkbox" id="lgd" onchange="lReady()">
+      <span>I understand Saavren is an <b>emergency-assistance tool, not a medical device</b>, and is not a replacement for doctors or ambulances. I agree to the guidelines &amp; privacy terms.</span>
+    </div>
+    <button class="proceed" id="loginBtn" onclick="doUserLogin()">Login →</button>
+  </div>
+</div>
+
+<!-- ============ PAGE 5 : MONITOR SIGN-UP ============ -->
+<div class="center hidden" id="page5">
+  <div class="formwrap">
+    <button class="back" onclick="goBack5()">← back</button>
+    <h2>👨‍👩‍👧 Monitor account — Sign up</h2>
+    <div class="sub">For family members keeping an eye on an elder · about 1 minute</div>
+
+    <!-- 1 NAME -->
+    <div class="fld"><label>1. Full name</label>
+      <input class="inp" placeholder="Full name">
+      <div class="eg">e.g. Priya Verma</div></div>
+
+    <!-- 2 CONTACT + EMAIL -->
+    <div class="fld"><label>2. Contact &amp; email</label>
+      <div class="phone">
+        <div class="ccode"><span class="flg" id="flagMon">🇮🇳</span><select id="dialMon" onchange="upd(this,'flagMon')"></select></div>
+        <input class="inp" placeholder="Phone number">
+      </div>
+      <input class="inp" style="margin-top:10px" placeholder="Email">
+      <div class="eg">Alerts &amp; emergency calls come to this number. Flag + code behave the same as the elder form.</div></div>
+
+    <!-- 3 GENDER -->
+    <div class="fld"><label>3. Gender</label>
+      <div class="chips"><button class="chip on">Male</button><button class="chip">Female</button><button class="chip">Other</button></div></div>
+
+    <!-- 4 INVITE LINK / CODE (optional) -->
+    <div class="fld"><label>4. User invitation link / code <span class="opt">— optional</span></label>
+      <input class="inp" placeholder="Invite link or 8-character code">
+      <div class="eg">e.g. saavren.app/join/SVN-8F2K or code SVN-8F2K — the elder generates EITHER a code OR a link during their own sign-up (step 6), and it also stays under Settings → “Invite family”. Both point to the same account. Skip it if you don't have one yet — you can link later.</div></div>
+
+    <!-- 5 RELATIONSHIP -->
+    <div class="fld"><label>5. You are the user's…</label>
+      <select class="inp">
+        <option value="">Select relationship…</option>
+        <option>Mother</option><option>Father</option><option>Son</option><option>Daughter</option>
+        <option>Spouse</option><option>Brother</option><option>Sister</option>
+        <option>Grandson</option><option>Granddaughter</option><option>Friend</option>
+        <option>Caregiver</option><option>Other relative</option>
+      </select>
+      <div class="eg">e.g. Mother, Father, Son, Daughter — how you're related to the elder. Helps the AI address you correctly.</div></div>
+
+    <!-- 6 GUIDELINES -->
+    <div class="guid">
+      <input type="checkbox" id="mgd" onchange="mReady()">
+      <span>I understand Saavren is an <b>emergency-assistance tool, not a medical device</b>, and is not a replacement for doctors or ambulances. I agree to the guidelines &amp; privacy terms.</span>
+    </div>
+    <!-- 7 PROCEED -->
+    <button class="proceed" id="mProceed" onclick="goMonitorPass()">Proceed →</button>
+  </div>
+</div>
+
+<!-- ============ PAGE 6 : MONITOR CREATE PASSWORD (same as user's) ============ -->
+<div class="center hidden" id="page6">
+  <div class="formwrap">
+    <button class="back" onclick="goBack6()">← back</button>
+    <h2>🔐 Create your password</h2>
+    <div class="sub">Last step · these are your login details</div>
+
+    <div class="fld"><label>Phone number</label>
+      <div class="locked"><span class="flg" id="mFlag">🇮🇳</span><span id="mSPhone">—</span><span class="lk">your login ID</span></div>
+      <div class="eg">Pulled from the details page — to change it, go back and edit field 2.</div></div>
+
+    <div class="fld"><label>Email</label>
+      <div class="locked"><span id="mSEmail">—</span><span class="lk">password resets go here</span></div></div>
+
+    <div class="fld"><label>Create password</label>
+      <div class="pw"><input class="inp" type="password" id="mpw1" placeholder="New password"><button class="eye" onclick="togglePwM()">👁</button></div>
+      <div class="eg">At least 8 characters — mix of letters &amp; numbers.</div></div>
+
+    <div class="fld"><label>Confirm password</label>
+      <div class="pw"><input class="inp" type="password" id="mpw2" placeholder="Retype password"></div>
+      <div class="eg" id="mpwmsg">Retype the same password.</div></div>
+
+    <button class="proceed" id="mCreate" onclick="createMonitor()">Create account →</button>
+  </div>
+</div>
+
+<!-- ============ PAGE 7 : MONITOR LOGIN (same as user login) ============ -->
+<div class="center hidden" id="page7">
+  <div class="formwrap">
+    <button class="back" onclick="goBack7()">← back</button>
+    <h2>👨‍👩‍👧 Monitor login</h2>
+    <div class="sub">Welcome back — family dashboard</div>
+
+    <div class="fld"><label>Registered email or phone</label>
+      <input class="inp" placeholder="Email or phone number">
+      <div class="eg">e.g. priya.verma@gmail.com or +91 98765 43210 — the one from your account</div></div>
+
+    <div class="ltab">
+      <button id="mtabPw" class="on" onclick="setMLMode('pw')">🔑 Password</button>
+      <button id="mtabOtp" onclick="setMLMode('otp')">📨 OTP</button>
+    </div>
+
+    <div id="mlPw">
+      <div class="fld"><label>Password</label>
+        <div class="pw"><input class="inp" type="password" id="mlpw" placeholder="Your password"><button class="eye" onclick="toggleMLp()">👁</button></div>
+      </div>
+      <button class="link" onclick="alert('Reset link sent to your registered email (demo)')">Forgot password?</button>
+    </div>
+
+    <div id="mlOtp" class="hidden">
+      <div class="fld"><label>One-time password (OTP)</label>
+        <button class="sendBtn" onclick="sendMOtp()">Send OTP →</button>
+        <div class="eg">Sent to your registered phone via SMS &amp; email. Valid for 5 minutes.</div>
+      </div>
+      <div class="fld"><div class="otp">
+        <input maxlength="1" inputmode="numeric"><input maxlength="1" inputmode="numeric"><input maxlength="1" inputmode="numeric"><input maxlength="1" inputmode="numeric"><input maxlength="1" inputmode="numeric"><input maxlength="1" inputmode="numeric">
+      </div><div class="eg" id="motpst">Enter the 6-digit code.</div></div>
+    </div>
+
+    <div class="guid">
+      <input type="checkbox" id="mlgd" onchange="mlReady()">
+      <span>I understand Saavren is an <b>emergency-assistance tool, not a medical device</b>, and is not a replacement for doctors or ambulances. I agree to the guidelines &amp; privacy terms.</span>
+    </div>
+    <button class="proceed" id="mloginBtn" onclick="doMonitorLogin()">Login →</button>
+  </div>
+</div>
+
+<!-- ============ PAGE 8 : ELDER HOME ============ -->
+<div class="center hidden" id="page8">
+  <div class="homehead">
+    <div class="hi">🙏 <em id="homeGreet">Hello, Mohan ji</em></div>
+    <div class="sub2"><span class="dot"></span>Saavren is awake &amp; listening · Monday, Oct 26</div>
+  </div>
+
+  <!-- AI bar — hero of the home -->
+  <div class="aibar" onclick="goChat('')">
+    <button class="kb" onclick="event.stopPropagation();goChat('type')" title="Type instead">⌨️</button>
+    <input id="homeinq" readonly placeholder="Type here… or tap 🎙️ to speak" onfocus="goChat('type')" onclick="event.stopPropagation();goChat('type')">
+    <button class="mic" onclick="event.stopPropagation();goChat('voice')" title="Speak">🎙️</button>
+  </div>
+  <div class="aihint">Ask me anything — medicines, health, calling family. Tap 🎙️ and just talk like normal.</div>
+  <div class="chipsRow">
+    <button class="ask" onclick="goChat('What are my medicines today?')">💊 My medicines today?</button>
+    <button class="ask" onclick="goChat('Show me my BP report')">🩺 My BP report</button>
+    <button class="ask" onclick="goChat('Call Priya please')">📞 Call Priya</button>
+  </div>
+
+  <!-- 4 icons below the bar (your order: health, settings, emergency, activity) -->
+  <div class="icons">
+    <div class="app" onclick="openHealth()"><span class="ic">🩺</span><span class="lbl">Health</span><span class="sm">BP · sugar · medicines</span></div>
+    <div class="app" onclick="openPanel('settings')"><span class="ic">⚙️</span><span class="lbl">Settings</span><span class="sm">voice · family · profile</span></div>
+    <div class="app sos" onclick="openPanel('sos')"><span class="ic">🚨</span><span class="lbl">Emergency</span><span class="sm">get help now</span></div>
+    <div class="app" onclick="openPanel('activity')"><span class="ic">🕓</span><span class="lbl">Activity</span><span class="sm">what happened today</span></div>
+  </div>
+</div>
+
+<!-- ============ PAGE 9 : FULL AI CONVERSATION (icons → hidden sidebar) ============ -->
+<div class="center hidden" id="page9">
+  <div class="edge" id="edge" onclick="toggleSide()" title="Show menu">»</div>
+  <div class="side" id="side">
+    <div class="sApp" onclick="openHealth()"><span class="ic">🩺</span><span class="sm">Health</span></div>
+    <div class="sApp" onclick="openPanel('settings')"><span class="ic">⚙️</span><span class="sm">Settings</span></div>
+    <div class="sApp sos" onclick="openPanel('sos')"><span class="ic">🚨</span><span class="sm">SOS</span></div>
+    <div class="sApp" onclick="openPanel('activity')"><span class="ic">🕓</span><span class="sm">Activity</span></div>
+    <!-- 3 new icons — sidebar only -->
+    <div class="sApp" onclick="openPanel('meds')"><span class="ic">💊</span><span class="sm">Medicines</span></div>
+    <div class="sApp" onclick="openPanel('family')"><span class="ic">📞</span><span class="sm">Family</span></div>
+    <div class="sApp" onclick="openPanel('ecard')"><span class="ic">🪪</span><span class="sm">E-Card</span></div>
+  </div>
+
+  <div class="chat">
+    <button class="back" onclick="goHome()">← home</button>
+    <div class="sub" style="margin-bottom:10px">💬 Talking with Saavren — chat starts in your selected language (🌐 change anytime) · type or tap 🎙️</div>
+    <div class="msgs" id="msgs">
+      <div class="msg ai" id="gmsg">Hello Mohan ji! 🙏 I'm Saavren — your companion. Tell me, how can I help you today?</div>
+    </div>
+    <div class="chatbar">
+      <button class="cbtn" onclick="voice()" title="Speak">🎙️</button>
+      <input id="chatInp" placeholder="Type your message…" onkeydown="if(event.key==='Enter')sendMsg()">
+      <button class="cbtn" onclick="sendMsg()" title="Send">➤</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PAGE 10 : MONITOR HOME (same as elder home; SOS → 🔔 Notifications) ============ -->
+<div class="center hidden" id="page10">
+  <div class="homehead">
+    <div class="hi">👨‍👩‍👧 <em id="mHomeGreet">Hello, Priya</em></div>
+    <div class="sub2"><span class="dot"></span>Watching over: <b>Mohan ji</b>, 72 (Father) · all normal 🟢 · updated 1 min ago</div>
+  </div>
+
+  <div class="aibar" onclick="mGoChat('')">
+    <button class="kb" onclick="event.stopPropagation();mGoChat('type')" title="Type instead">⌨️</button>
+    <input readonly placeholder="Ask about Mohan ji… or tap 🎙️" onfocus="mGoChat('type')" onclick="event.stopPropagation();mGoChat('type')">
+    <button class="mic" onclick="event.stopPropagation();mGoChat('voice')" title="Speak">🎙️</button>
+  </div>
+  <div class="aihint">Ask anything about Mohan ji — health, medicines, today's activity. 🎙️ voice works for you too.</div>
+  <div class="chipsRow">
+    <button class="ask" onclick="mGoChat('How is Mohan ji today?')">🙂 How is he today?</button>
+    <button class="ask" onclick="mGoChat('Did he take his medicines?')">💊 Medicines taken?</button>
+    <button class="ask" onclick="mGoChat('Any alerts for me today?')">🔔 Any alerts?</button>
+  </div>
+
+  <!-- same 4-tile grid, SOS replaced by 🔔 Alerts -->
+  <div class="icons">
+    <div class="app" onclick="openHealth()"><span class="ic">🩺</span><span class="lbl">Health</span><span class="sm">his BP · sugar · vitals</span></div>
+    <div class="app" onclick="openPanel('settings')"><span class="ic">⚙️</span><span class="lbl">Settings</span><span class="sm">notifications · profile</span></div>
+    <div class="app notif" onclick="openPanel('notifs')"><span class="badge" id="mBadge">2</span><span class="ic">🔔</span><span class="lbl">Alerts</span><span class="sm">alerts &amp; messages received</span></div>
+    <div class="app" onclick="openPanel('activity')"><span class="ic">🕓</span><span class="lbl">Activity</span><span class="sm">his day timeline</span></div>
+  </div>
+</div>
+
+<!-- ============ PAGE 11 : MONITOR FULL CHAT (icons → hidden sidebar) ============ -->
+<div class="center hidden" id="page11">
+  <div class="edge" id="medge" onclick="mToggleSide()" title="Show menu">»</div>
+  <div class="side" id="mside">
+    <div class="sApp" onclick="openHealth()"><span class="ic">🩺</span><span class="sm">Health</span></div>
+    <div class="sApp" onclick="openPanel('settings')"><span class="ic">⚙️</span><span class="sm">Settings</span></div>
+    <div class="sApp notif" onclick="openPanel('notifs')"><span class="ic">🔔</span><span class="sm">Alerts</span></div>
+    <div class="sApp" onclick="openPanel('activity')"><span class="ic">🕓</span><span class="sm">Activity</span></div>
+    <div class="sApp" onclick="openPanel('meds')"><span class="ic">💊</span><span class="sm">Medicines</span></div>
+    <div class="sApp" onclick="openPanel('family')"><span class="ic">📞</span><span class="sm">Family</span></div>
+    <div class="sApp" onclick="openPanel('ecard')"><span class="ic">🪪</span><span class="sm">E-Card</span></div>
+  </div>
+
+  <div class="chat">
+    <button class="back" onclick="mGoHome()">← home</button>
+    <div class="sub" style="margin-bottom:10px">💬 Asking Saavren about Mohan ji — starts in your selected language (🌐 change anytime) · type or tap 🎙️</div>
+    <div class="msgs" id="mmsgs">
+      <div class="msg ai" id="mGmsg">Hello Priya! I'm Saavren — watching over Mohan ji with you. What would you like to know?</div>
+    </div>
+    <div class="chatbar">
+      <button class="cbtn" onclick="mvoice()" title="Speak">🎙️</button>
+      <input id="mchatInp" placeholder="Type your message…" onkeydown="if(event.key==='Enter')mSendMsg()">
+      <button class="cbtn" onclick="mSendMsg()" title="Send">➤</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PAGE 12 : HEALTH DASHBOARD (🩺 icon ka real working) ============ -->
+<div class="center hidden" id="page12">
+  <div class="formwrap" style="max-width:620px">
+    <button class="back" onclick="backFromHealth()">← back</button>
+    <h2>🩺 Health dashboard</h2>
+    <div class="sub">Your body &amp; your week — tap anything to edit</div>
+
+    <!-- 1 · profile & body (sab editable) -->
+    <div class="secT">1 · You (editable)</div>
+    <div class="hcard">
+      <div class="hgrid">
+        <div>
+          <span class="lbl2">Gender</span>
+          <div class="chips hchips"><button class="chip on">Male</button><button class="chip">Female</button><button class="chip">Other</button></div>
+        </div>
+        <div>
+          <span class="lbl2">Age &amp; date of birth</span>
+          <div style="font-size:15px;font-weight:800">Age: <span id="ageShow">72</span></div>
+          <input class="inp" type="date" id="dob" value="1954-05-14" onchange="ageFromDob()" style="margin-top:6px;padding:9px 12px;font-size:14px">
+          <div class="eg">Change DOB — age recalculates itself.</div>
+        </div>
+      </div>
+      <hr style="border:none;border-top:1px solid var(--line);margin:14px 0">
+      <span class="lbl2">Medical conditions (from your sign-up — editable)</span>
+      <input class="inp" id="cond" value="Diabetes, High BP" style="padding:10px 12px;font-size:14px">
+      <hr style="border:none;border-top:1px solid var(--line);margin:14px 0">
+      <div class="hgrid" style="grid-template-columns:1fr 1fr 1fr">
+        <div><span class="lbl2">Weight (kg)</span><input class="inp" id="wt" type="number" value="64" oninput="calcBMI()" style="padding:10px 12px;font-size:14px"></div>
+        <div><span class="lbl2">Height (cm)</span><input class="inp" id="ht" type="number" value="165" oninput="calcBMI()" style="padding:10px 12px;font-size:14px"></div>
+        <div><span class="lbl2">Blood group</span>
+          <select class="inp" id="bg" style="padding:10px 12px;font-size:14px">
+            <option>B+</option><option>A+</option><option>A−</option><option>B−</option><option>AB+</option><option>AB−</option><option>O+</option><option>O−</option>
+          </select></div>
+      </div>
+      <div class="hgrid" style="grid-template-columns:1fr 170px;margin-top:14px;align-items:stretch">
+        <div style="display:flex;align-items:flex-end">
+          <button class="sendBtn" style="max-width:220px" onclick="saveHealth()">💾 Save changes</button>
+        </div>
+        <div class="bmibox">
+          <span class="lbl2" style="margin-bottom:4px">BMI · auto</span>
+          <div class="n" id="bmiN">23.5</div>
+          <span class="pill" id="bmiCat">Normal</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2 · weekly leaderboard -->
+    <div class="secT">2 · Weekly leaderboard</div>
+    <div class="hcard">
+      <table class="lb">
+        <tr><th>Pos</th><th>Day</th><th>Date</th><th>Points</th></tr>
+        <tr><td class="pos">#4</td><td>Wednesday</td><td>Oct 21</td><td class="pts">62</td></tr>
+        <tr><td class="pos">#3</td><td>Thursday</td><td>Oct 22</td><td class="pts">70</td></tr>
+        <tr><td class="pos">#2</td><td>Friday</td><td>Oct 23</td><td class="pts">78</td></tr>
+        <tr><td class="pos">#5</td><td>Saturday</td><td>Oct 24</td><td class="pts">54</td></tr>
+        <tr><td class="pos">#3</td><td>Sunday</td><td>Oct 25</td><td class="pts">66</td></tr>
+        <tr><td class="pos">🥇 #1</td><td>Monday</td><td>Oct 26</td><td class="pts">88</td></tr>
+        <tr class="live"><td class="pos">#2 →</td><td><b>Today</b> (live)</td><td>Oct 27</td><td class="pts">41 so far…</td></tr>
+      </table>
+      <div class="eg" style="margin-top:8px">Ranked among <b>128 Saavren users aged 65+ in Lucknow</b> · rank resets every Monday.</div>
+    </div>
+    <div class="hcard" style="margin-top:10px">
+      <span class="lbl2" style="font-size:12px">How points are earned</span>
+      <div class="pbul">✅ Morning check-in (“I'm fine”) <b>+8</b></div>
+      <div class="pbul">💊 Each medicine taken on time <b>+10</b></div>
+      <div class="pbul">🚶 Walk / activity detected <b>+5</b></div>
+      <div class="pbul">🩺 Vitals logged (BP / sugar) <b>+4</b></div>
+      <div class="pbul">💬 Talked with Saavren <b>+3</b></div>
+      <div class="pbul">⚠️ Medicine missed <b>−5</b></div>
+      <div class="eg" style="margin-top:10px">Points reward <b>consistency, not fitness level</b> — anyone can climb the board.</div>
+    </div>
+
+    <!-- 3 · today (bonus extras) -->
+    <div class="secT">3 · Today</div>
+    <div class="hcard">
+      <div class="hrow">
+        <div class="stat"><b>128/82</b><span>BP 🩺</span></div>
+        <div class="stat"><b>105</b><span>Sugar 🍬</span></div>
+      </div>
+      <div class="hrow" style="margin-bottom:0">
+        <div class="stat"><b>74</b><span>❤️ bpm</span></div>
+        <div class="stat"><b>98%</b><span>SpO₂ 🫁</span></div>
+      </div>
+      <hr style="border:none;border-top:1px solid var(--line);margin:14px 0">
+      <div style="display:flex;justify-content:space-between;font-size:14px;font-weight:800"><span>🔥 6-day streak</span><span>231 / 300 weekly pts</span></div>
+      <div class="prog"><div style="width:77%"></div></div>
+      <div class="eg" style="margin-top:8px">69 more points this week = 🏅 “Consistency Star” badge.</div>
+    </div>
+  </div>
+</div>
+
+<div class="toast hidden" id="toast"></div>
+
+<!-- feature panel overlay (top-level: works from home AND chat) -->
+<div class="ovl hidden" id="ovl" onclick="if(event.target===this)closePanel()">
+  <div class="panel">
+    <div class="phead"><span id="pTitle">—</span><button class="mini" onclick="closePanel()">✕ Close</button></div>
+    <div id="pBody">—</div>
+  </div>
+</div>
+
+<script>
+/* ---------- translations (page 1) ---------- */
+const T = {
+  en:{tag:'You are not alone',user_t:'I am the User',user_p:'For elders — one big help button, talk by voice, daily health check-ins',mon_t:'Monitor (Family)',mon_p:'Family dashboard — live alerts, health trends, incident reports, from anywhere',login:'Login',signup:'New account — Sign up',foot:'🛡️ Emergency guardian · ❤️ Daily health companion · Meta Global AI Hackathon 2026'},
+  hi:{tag:'आप अकेले नहीं हैं',user_t:'मैं User हूँ',user_p:'बुज़ुर्गों के लिए — एक बड़ा मदद बटन, आवाज़ से बात, रोज़ की सेहत चेक-इन',mon_t:'मॉनिटर (परिवार)',mon_p:'फैमिली डैशबोर्ड — लाइव अलर्ट, सेहत ट्रेंड, कहीं से भी',login:'लॉगिन',signup:'नया अकाउंट — साइन अप',foot:'🛡️ आपातकालीन रक्षक · ❤️ रोज़ाना सेहत साथी · Meta Global AI Hackathon 2026'},
+  bn:{tag:'আপনি একা নন',user_t:'আমি ব্যবহারকারী',user_p:'বয়স্কদের জন্য — বড় সাহায্য বোতাম, কণ্ঠে কথা',mon_t:'মনিটর (পরিবার)',mon_p:'ফ্যামিলি ড্যাশবোর্ড — লাইভ অ্যালার্ট, যেকোনো জায়গা থেকে',login:'লগইন',signup:'নতুন অ্যাকাউন্ট',foot:'🛡️ জরুরি রক্ষক · ❤️ স্বাস্থ্য সঙ্গী · Hackathon 2026'},
+  ta:{tag:'நீங்கள் தனியாக இல்லை',user_t:'நான் பயனர்',user_p:'மூத்தோர் — உதவி பட்டன், குரல், சுக சேர்க்கை',mon_t:'மானிட்டர் (குடும்பம்)',mon_p:'டாஷ்போர்டு — நேரடி எச்சரிக்கைகள்',login:'உள்நுழை',signup:'புதிய கணக்கு',foot:'🛡️ அவசர காவலர் · ❤️ நலத் துணை'},
+  te:{tag:'మీరు ఒంటరివాళ్ళు కాదు',user_t:'నేను యూజర్‌ను',user_p:'వృద్ధుల కోసం — సహాయ బటన్, గళమే మాట',mon_t:'మానిటర్ (కుటుంబం)',mon_p:'డాష్‌బోర్డ్ — లైవ్ అలర్ట్స్',login:'లాగిన్',signup:'కొత్త ఖాతా',foot:'🛡️ రక్షకుడు · ❤️ సాహాయకుడు'},
+  mr:{tag:'तुम्ही एकटे नाही',user_t:'मी युजर आहे',user_p:'ज्येष्ठांसाठी — मदत बटण, आवाजाने बोला',mon_t:'मॉनिटर (कुटुंब)',mon_p:'डॅशबोर्ड — लाइव्ह अलर्ट',login:'लॉगिन',signup:'नवीन खाते',foot:'🛡️ रक्षक · ❤️ आरोग्य साथी'},
+  gu:{tag:'તમે એકલા નથી',user_t:'હું યુઝર છું',user_p:'વડીલો માટે — મદદ બટન, અવાજથી વાત',mon_t:'મોનિટર (પરિવાર)',mon_p:'ડેશબોર્ડ — લાઈવ એલર્ટ',login:'લોગિન',signup:'નવું એકાઉન્ટ',foot:'🛡️ રક્ષક · ❤️ આરોગ્ય સાથી'},
+  es:{tag:'No estás solo',user_t:'Soy el Usuario',user_p:'Para mayores — botón de ayuda, habla por voz',mon_t:'Monitor (Familia)',mon_p:'Panel familiar — alertas en vivo',login:'Iniciar sesión',signup:'Cuenta nueva',foot:'🛡️ Guardián · ❤️ Salud · Hackathon 2026'},
+  fr:{tag:'Vous n’êtes pas seul',user_t:'Je suis l’Utilisateur',user_p:'Pour les aînés — bouton d’aide, voix',mon_t:'Moniteur (Famille)',mon_p:'Tableau de bord — alertes en direct',login:'Connexion',signup:'Nouveau compte',foot:'🛡️ Gardien · ❤️ Santé · Hackathon 2026'},
+};
+let curLang='en';
+const GREET={en:'Hello, Mohan ji',hi:'नमस्ते, मोहन जी',bn:'নমস্কার, মোহন জি',ta:'வணக்கம், மோகன் ஜீ',te:'నమస్తే, మోహన్ గారు',mr:'नमस्कार, मोहन जी',gu:'નમસ્તે, મોહન જી',es:'Hola, Mohan ji',fr:'Bonjour, Mohan ji'};
+const CHAT={
+  en:"Hello Mohan ji! 🙏 I'm Saavren — your companion. Tell me, how can I help you today?",
+  hi:'नमस्ते मोहन जी! 🙏 मैं हूँ Saavren — आपका साथी। बताइए, कैसे मदद करूँ?',
+  bn:'নমস্কার মোহন জি! 🙏 আমি Saavren — আপনার সঙ্গী। বলুন, কীভাবে সাহায্য করতে পারি?',
+  ta:'வணக்கம் மோகன் ஜீ! 🙏 நான் Saavren — உங்கள் துணை. சொல்லுங்கள், எப்படி உதவலாம்?',
+  te:'నమస్తే మోహన్ గారు! 🙏 నేను Saavren — మీ తోడు. చెప్పండి, ఎలా సాయం చేయాలి?',
+  mr:'नमस्कार मोहन जी! 🙏 मी Saavren — तुमचा सोबती. सांगा, कशी मदत करू?',
+  gu:'નમસ્તે મોહન જી! 🙏 હું Saavren — તમારો સાથી. કહો, કેવી રીતે મદદ કરું?',
+  es:'¡Hola Mohan ji! 🙏 Soy Saavren, tu compañero. Dime, ¿en qué puedo ayudarte hoy?',
+  fr:'Bonjour Mohan ji ! 🙏 Je suis Saavren, votre compagnon. Dites-moi, comment puis-je vous aider ?'
+};
+const GREETM={en:'Hello, Priya',hi:'नमस्ते, प्रिया',bn:'নমস্কার, প্রিয়া',ta:'வணக்கம், பிரியா',te:'నమస్తే, ప్రియా',mr:'नमस्कार, प्रिया',gu:'નમસ્તે, પ્રિયા',es:'Hola, Priya',fr:'Bonjour, Priya'};
+const GMON={
+  en:"Hello Priya! I'm Saavren — watching over Mohan ji with you. What would you like to know?",
+  hi:'नमस्ते प्रिया! मैं हूँ Saavren — मोहन जी की देखभाल में आपकी साथी। क्या जानना चाहेंगी?'
+};
+function setLang(l){
+  curLang=l;
+  const d=T[l]||T.en;document.querySelectorAll('[data-i]').forEach(el=>{const k=el.dataset.i;if(d[k])el.textContent=d[k];});
+  const hg=document.getElementById('homeGreet');if(hg)hg.textContent=GREET[l]||GREET.en;
+  const gm=document.getElementById('gmsg');if(gm)gm.textContent=CHAT[l]||CHAT.en;
+  const mg=document.getElementById('mHomeGreet');if(mg)mg.textContent=GREETM[l]||GREETM.en;
+  const mm=document.getElementById('mGmsg');if(mm)mm.textContent=GMON[l]||GMON.en;
+}
+function toggleTheme(){const h=document.documentElement;const n=h.dataset.theme==='dark'?'light':'dark';h.dataset.theme=n;document.getElementById('tl').textContent=n==='dark'?'dark · grey':'light · teal';}
+function goSignup(){document.getElementById('page1').classList.add('hidden');document.getElementById('page2').classList.remove('hidden');window.scrollTo(0,0);}
+function goBack(){document.getElementById('page2').classList.add('hidden');document.getElementById('page1').classList.remove('hidden');}
+document.querySelectorAll('.chips .chip').forEach(c=>{c.onclick=()=>{c.parentElement.querySelectorAll('.chip').forEach(x=>x.classList.remove('on'));c.classList.add('on');};});
+
+/* ---------- ALL COUNTRIES (name, iso2, dial) ---------- */
+const COUNTRIES=[
+["Afghanistan","AF",93],["Albania","AL",355],["Algeria","DZ",213],["Andorra","AD",376],["Angola","AO",244],
+["Antigua & Barbuda","AG",1],["Argentina","AR",54],["Armenia","AM",374],["Australia","AU",61],["Austria","AT",43],
+["Azerbaijan","AZ",994],["Bahamas","BS",1],["Bahrain","BH",973],["Bangladesh","BD",880],["Barbados","BB",1],
+["Belarus","BY",375],["Belgium","BE",32],["Belize","BZ",501],["Benin","BJ",229],["Bhutan","BT",975],
+["Bolivia","BO",591],["Bosnia & Herzegovina","BA",387],["Botswana","BW",267],["Brazil","BR",55],["Brunei","BN",673],
+["Bulgaria","BG",359],["Burkina Faso","BF",226],["Burundi","BI",257],["Cambodia","KH",855],["Cameroon","CM",237],
+["Canada","CA",1],["Cape Verde","CV",238],["Central African Republic","CF",236],["Chad","TD",235],["Chile","CL",56],
+["China","CN",86],["Colombia","CO",57],["Comoros","KM",269],["Congo","CG",242],["Congo (DRC)","CD",243],
+["Costa Rica","CR",506],["Croatia","HR",385],["Cuba","CU",53],["Cyprus","CY",357],["Czech Republic","CZ",420],
+["Denmark","DK",45],["Djibouti","DJ",253],["Dominica","DM",1],["Dominican Republic","DO",1],["Ecuador","EC",593],
+["Egypt","EG",20],["El Salvador","SV",503],["Equatorial Guinea","GQ",240],["Eritrea","ER",291],["Estonia","EE",372],
+["Eswatini","SZ",268],["Ethiopia","ET",251],["Fiji","FJ",679],["Finland","FI",358],["France","FR",33],
+["Gabon","GA",241],["Gambia","GM",220],["Georgia","GE",995],["Germany","DE",49],["Ghana","GH",233],
+["Greece","GR",30],["Grenada","GD",1],["Guatemala","GT",502],["Guinea","GN",224],["Guinea-Bissau","GW",245],
+["Guyana","GY",592],["Haiti","HT",509],["Honduras","HN",504],["Hong Kong","HK",852],["Hungary","HU",36],
+["Iceland","IS",354],["India","IN",91],["Indonesia","ID",62],["Iran","IR",98],["Iraq","IQ",964],
+["Ireland","IE",353],["Israel","IL",972],["Italy","IT",39],["Ivory Coast","CI",225],["Jamaica","JM",1],
+["Japan","JP",81],["Jordan","JO",962],["Kazakhstan","KZ",7],["Kenya","KE",254],["Kiribati","KI",686],
+["Kosovo","XK",383],["Kuwait","KW",965],["Kyrgyzstan","KG",996],["Laos","LA",856],["Latvia","LV",371],
+["Lebanon","LB",961],["Lesotho","LS",266],["Liberia","LR",231],["Libya","LY",218],["Liechtenstein","LI",423],
+["Lithuania","LT",370],["Luxembourg","LU",352],["Macau","MO",853],["Madagascar","MG",261],["Malawi","MW",265],
+["Malaysia","MY",60],["Maldives","MV",960],["Mali","ML",223],["Malta","MT",356],["Marshall Islands","MH",692],
+["Mauritania","MR",222],["Mauritius","MU",230],["Mexico","MX",52],["Micronesia","FM",691],["Moldova","MD",373],
+["Monaco","MC",377],["Mongolia","MN",976],["Montenegro","ME",382],["Morocco","MA",212],["Mozambique","MZ",258],
+["Myanmar","MM",95],["Namibia","NA",264],["Nauru","NR",674],["Nepal","NP",977],["Netherlands","NL",31],
+["New Zealand","NZ",64],["Nicaragua","NI",505],["Niger","NE",227],["Nigeria","NG",234],["North Korea","KP",850],
+["North Macedonia","MK",389],["Norway","NO",47],["Oman","OM",968],["Pakistan","PK",92],["Palau","PW",680],
+["Palestine","PS",970],["Panama","PA",507],["Papua New Guinea","PG",675],["Paraguay","PY",595],["Peru","PE",51],
+["Philippines","PH",63],["Poland","PL",48],["Portugal","PT",351],["Puerto Rico","PR",1],["Qatar","QA",974],
+["Romania","RO",40],["Russia","RU",7],["Rwanda","RW",250],["Saint Kitts & Nevis","KN",1],["Saint Lucia","LC",1],
+["Saint Vincent & Grenadines","VC",1],["Samoa","WS",685],["San Marino","SM",378],["Sao Tome & Principe","ST",239],
+["Saudi Arabia","SA",966],["Senegal","SN",221],["Serbia","RS",381],["Seychelles","SC",248],["Sierra Leone","SL",232],
+["Singapore","SG",65],["Slovakia","SK",421],["Slovenia","SI",386],["Solomon Islands","SB",677],["Somalia","SO",252],
+["South Africa","ZA",27],["South Korea","KR",82],["South Sudan","SS",211],["Spain","ES",34],["Sri Lanka","LK",94],
+["Sudan","SD",249],["Suriname","SR",597],["Sweden","SE",46],["Switzerland","CH",41],["Syria","SY",963],
+["Taiwan","TW",886],["Tajikistan","TJ",992],["Tanzania","TZ",255],["Thailand","TH",66],["Timor-Leste","TL",670],
+["Togo","TG",228],["Tonga","TO",676],["Trinidad & Tobago","TT",1],["Tunisia","TN",216],["Turkey","TR",90],
+["Turkmenistan","TM",993],["Tuvalu","TV",688],["Uganda","UG",256],["Ukraine","UA",380],["United Arab Emirates","AE",971],
+["United Kingdom","GB",44],["United States","US",1],["Uruguay","UY",598],["Uzbekistan","UZ",998],["Vanuatu","VU",678],
+["Vatican City","VA",39],["Venezuela","VE",58],["Vietnam","VN",84],["Yemen","YE",967],["Zambia","ZM",260],["Zimbabwe","ZW",263]
+];
+
+function FLAGF(cc){return String.fromCodePoint(...[...cc.toUpperCase()].map(ch=>0x1F1E6+ch.charCodeAt(0)-65));}
+
+/* ---------- REGIONS : state -> cities ---------- */
+const REGIONS={
+IN:{
+"Andhra Pradesh":["Visakhapatnam","Vijayawada","Guntur","Nellore","Kurnool","Rajahmundry","Tirupati","Kakinada","Anantapur","Eluru","Ongole","Vizianagaram","Chittoor","Machilipatnam","Kadapa"],
+"Arunachal Pradesh":["Itanagar","Naharlagun","Pasighat","Tawang","Ziro"],
+"Assam":["Guwahati","Silchar","Dibrugarh","Jorhat","Nagaon","Tinsukia","Tezpur","Bongaigaon","Dhubri","Sivasagar"],
+"Bihar":["Patna","Gaya","Bhagalpur","Muzaffarpur","Purnia","Darbhanga","Bihar Sharif","Arrah","Begusarai","Katihar","Munger","Chhapra","Saharsa","Sasaram","Hajipur","Siwan","Motihari","Bettiah"],
+"Chandigarh":["Chandigarh"],
+"Chhattisgarh":["Raipur","Bhilai","Bilaspur","Korba","Durg","Rajnandgaon","Raigarh","Jagdalpur","Ambikapur"],
+"Dadra & Nagar Haveli and Daman & Diu":["Daman","Diu","Silvassa"],
+"Delhi (NCT)":["New Delhi","North Delhi","South Delhi","East Delhi","West Delhi","Central Delhi","Dwarka","Rohini","Narela"],
+"Goa":["Panaji","Margao","Vasco da Gama","Mapusa","Ponda","Bicholim"],
+"Gujarat":["Ahmedabad","Surat","Vadodara","Rajkot","Bhavnagar","Jamnagar","Junagadh","Gandhinagar","Anand","Nadiad","Morbi","Surendranagar","Bharuch","Vapi","Navsari","Porbandar","Mehsana","Bhuj","Palanpur","Valsad","Godhra"],
+"Haryana":["Faridabad","Gurugram","Panipat","Ambala","Yamunanagar","Rohtak","Hisar","Karnal","Sonipat","Panchkula","Bhiwani","Sirsa","Bahadurgarh","Jind","Kurukshetra","Rewari"],
+"Himachal Pradesh":["Shimla","Dharamshala","Solan","Mandi","Kullu","Manali","Palampur","Hamirpur","Una","Kangra","Nahan"],
+"Jammu & Kashmir":["Srinagar","Jammu","Anantnag","Baramulla","Sopore","Udhampur","Kathua","Rajouri","Poonch"],
+"Jharkhand":["Ranchi","Jamshedpur","Dhanbad","Bokaro","Deoghar","Hazaribagh","Giridih","Ramgarh","Dumka","Chaibasa"],
+"Karnataka":["Bengaluru","Mysuru","Hubballi","Mangaluru","Belagavi","Kalaburagi","Davangere","Ballari","Vijayapura","Tumakuru","Shivamogga","Raichur","Bidar","Udupi","Hassan","Chitradurga","Kolar","Mandya","Hospet"],
+"Kerala":["Thiruvananthapuram","Kochi","Kozhikode","Thrissur","Kollam","Palakkad","Alappuzha","Kannur","Kottayam","Malappuram","Pathanamthitta","Thalassery","Manjeri","Tirur","Kalpetta"],
+"Ladakh":["Leh","Kargil","Drass"],
+"Lakshadweep":["Kavaratti","Agatti"],
+"Madhya Pradesh":["Indore","Bhopal","Jabalpur","Gwalior","Ujjain","Sagar","Dewas","Satna","Ratlam","Rewa","Katni","Singrauli","Burhanpur","Khandwa","Chhindwara","Bhind","Morena","Hoshangabad","Damoh","Vidisha","Sehore","Betul","Neemuch","Itarsi"],
+"Maharashtra":["Mumbai","Pune","Nagpur","Thane","Nashik","Chhatrapati Sambhaji Nagar (Aurangabad)","Navi Mumbai","Solapur","Kolhapur","Amravati","Malegaon","Jalgaon","Akola","Latur","Dhule","Ahmednagar","Chandrapur","Parbhani","Nanded","Sangli","Satara","Beed","Ratnagiri","Wardha","Yavatmal","Bhiwandi","Ulhasnagar","Kalyan-Dombivli","Vasai-Virar","Pimpri-Chinchwad"],
+"Manipur":["Imphal","Thoubal","Bishnupur","Churachandpur","Ukhrul"],
+"Meghalaya":["Shillong","Tura","Jowai","Nongpoh","Baghmara"],
+"Mizoram":["Aizawl","Lunglei","Serchhip","Champhai","Kolasib"],
+"Nagaland":["Kohima","Dimapur","Mokokchung","Tuensang","Wokha"],
+"Odisha":["Bhubaneswar","Cuttack","Rourkela","Brahmapur","Sambalpur","Puri","Balasore","Bhadrak","Baripada","Angul","Jharsuguda","Jeypore","Dhenkanal","Kendujhar"],
+"Puducherry":["Puducherry","Karaikal","Mahe","Yanam"],
+"Punjab":["Ludhiana","Amritsar","Jalandhar","Patiala","Bathinda","Mohali","Hoshiarpur","Pathankot","Moga","Ferozepur","Gurdaspur","Faridkot","Sangrur","Kapurthala","Muktsar"],
+"Rajasthan":["Jaipur","Jodhpur","Udaipur","Kota","Ajmer","Bikaner","Alwar","Bharatpur","Bhilwara","Sikar","Pali","Tonk","Chittorgarh","Banswara","Sri Ganganagar","Hanumangarh","Barmer","Jaisalmer","Bundi","Nagaur","Dholpur","Sawai Madhopur","Churu","Jhunjhunu"],
+"Sikkim":["Gangtok","Namchi","Gyalshing","Mangan"],
+"Tamil Nadu":["Chennai","Coimbatore","Madurai","Tiruchirappalli","Salem","Tirunelveli","Vellore","Erode","Thanjavur","Tiruppur","Thoothukudi","Nagercoil","Karur","Kumbakonam","Dindigul","Namakkal","Pudukkottai","Cuddalore","Kanchipuram","Hosur","Ooty","Pollachi","Krishnagiri"],
+"Telangana":["Hyderabad","Warangal","Nizamabad","Karimnagar","Khammam","Mahbubnagar","Ramagundam","Nalgonda","Adilabad","Kothagudem","Suryapet","Jagtial"],
+"Tripura":["Agartala","Udaipur","Dharmanagar","Belonia","Ambassa"],
+"Uttar Pradesh":["Lucknow","Kanpur","Kanpur Dehat","Ghaziabad","Agra","Varanasi","Meerut","Prayagraj","Bareilly","Aligarh","Moradabad","Gorakhpur","Noida","Greater Noida","Saharanpur","Jhansi","Muzaffarnagar","Mathura","Ayodhya","Shahjahanpur","Rampur","Etawah","Mirzapur","Bijnor","Firozabad","Bulandshahr","Raebareli","Sultanpur","Budaun","Barabanki","Sitapur","Gonda","Deoria","Kushinagar","Ballia","Mau","Azamgarh","Jaunpur","Mainpuri","Etah","Hardoi","Bahraich","Lakhimpur Kheri","Unnao","Amroha","Hathras","Pilibhit","Basti","Sambhal","Kasganj","Farrukhabad","Ghazipur","Balrampur","Shravasti","Banda","Chitrakoot","Hamirpur","Mahoba","Orai","Fatehpur","Pratapgarh","Kaushambi","Sant Kabir Nagar","Siddharthnagar","Shamli","Hapur","Amethi","Chandauli","Bhadohi","Sonbhadra"],
+"Uttarakhand":["Dehradun","Haridwar","Rishikesh","Haldwani","Rudrapur","Roorkee","Kashipur","Almora","Nainital","Mussoorie","Pithoragarh","Tehri Garhwal","Chamba","Kotdwar","Ranikhet","Bageshwar"],
+"West Bengal":["Kolkata","Howrah","Siliguri","Durgapur","Asansol","Kharagpur","Darjeeling","Bardhaman","Malda","Baharampur","Jalpaiguri","Haldia","Krishnanagar","Raiganj","Medinipur","Cooch Behar","Bankura","Purulia","Alipurduar","Kalyani"]
+},
+US:{
+"Alabama":["Birmingham","Montgomery","Huntsville","Mobile"],"Alaska":["Anchorage","Fairbanks","Juneau"],
+"Arizona":["Phoenix","Tucson","Mesa","Scottsdale"],"Arkansas":["Little Rock","Fayetteville","Fort Smith"],
+"California":["Los Angeles","San Francisco","San Diego","San Jose","Sacramento","Fresno","Long Beach","Oakland","Anaheim","Santa Ana","Riverside","Irvine"],
+"Colorado":["Denver","Colorado Springs","Aurora","Boulder","Fort Collins"],"Connecticut":["Hartford","Bridgeport","New Haven","Stamford"],
+"Delaware":["Wilmington","Dover","Newark"],"District of Columbia":["Washington, D.C."],
+"Florida":["Miami","Orlando","Tampa","Jacksonville","Fort Lauderdale","St. Petersburg","Tallahassee","West Palm Beach"],
+"Georgia":["Atlanta","Savannah","Augusta","Columbus","Macon"],"Hawaii":["Honolulu","Hilo"],
+"Idaho":["Boise","Idaho Falls","Coeur d'Alene"],"Illinois":["Chicago","Springfield","Aurora","Naperville","Peoria","Rockford"],
+"Indiana":["Indianapolis","Fort Wayne","Evansville","South Bend"],"Iowa":["Des Moines","Cedar Rapids","Davenport"],
+"Kansas":["Wichita","Topeka","Kansas City (KS)","Overland Park"],"Kentucky":["Louisville","Lexington","Bowling Green"],
+"Louisiana":["New Orleans","Baton Rouge","Shreveport","Lafayette"],"Maine":["Portland","Bangor","Augusta"],
+"Maryland":["Baltimore","Annapolis","Frederick","Rockville"],"Massachusetts":["Boston","Cambridge","Worcester","Springfield (MA)"],
+"Michigan":["Detroit","Grand Rapids","Ann Arbor","Lansing"],"Minnesota":["Minneapolis","Saint Paul","Rochester","Duluth"],
+"Mississippi":["Jackson","Gulfport","Biloxi"],"Missouri":["Kansas City (MO)","St. Louis","Springfield (MO)","Columbia"],
+"Montana":["Billings","Missoula","Bozeman","Helena"],"Nebraska":["Omaha","Lincoln"],
+"Nevada":["Las Vegas","Reno","Henderson"],"New Hampshire":["Manchester","Nashua","Concord"],
+"New Jersey":["Newark","Jersey City","Paterson","Trenton","Atlantic City"],"New Mexico":["Albuquerque","Santa Fe","Las Cruces"],
+"New York":["New York City","Buffalo","Rochester","Syracuse","Albany","Yonkers"],
+"North Carolina":["Charlotte","Raleigh","Greensboro","Durham","Winston-Salem","Asheville"],"North Dakota":["Fargo","Bismarck","Grand Forks"],
+"Ohio":["Columbus","Cleveland","Cincinnati","Toledo","Akron","Dayton"],"Oklahoma":["Oklahoma City","Tulsa","Norman"],
+"Oregon":["Portland","Salem","Eugene"],"Pennsylvania":["Philadelphia","Pittsburgh","Allentown","Erie","Harrisburg"],
+"Rhode Island":["Providence"],"South Carolina":["Columbia","Charleston","Greenville"],
+"South Dakota":["Sioux Falls","Rapid City"],"Tennessee":["Nashville","Memphis","Knoxville","Chattanooga"],
+"Texas":["Houston","Dallas","Austin","San Antonio","Fort Worth","El Paso","Arlington","Corpus Christi","Plano","Lubbock"],
+"Utah":["Salt Lake City","Provo","Ogden"],"Vermont":["Burlington","Montpelier"],
+"Virginia":["Virginia Beach","Richmond","Norfolk","Arlington (VA)","Alexandria"],"Washington":["Seattle","Spokane","Tacoma","Bellevue"],
+"West Virginia":["Charleston","Huntington","Morgantown"],"Wisconsin":["Milwaukee","Madison","Green Bay"],"Wyoming":["Cheyenne","Casper"]
+},
+GB:{
+"England":["London","Manchester","Birmingham","Liverpool","Leeds","Sheffield","Bristol","Newcastle upon Tyne","Nottingham","Leicester","Coventry","Brighton","Portsmouth","Southampton","Oxford","Cambridge","York","Plymouth","Hull","Bath","Norwich","Exeter","Canterbury","Durham"],
+"Scotland":["Edinburgh","Glasgow","Aberdeen","Dundee","Inverness","Stirling"],
+"Wales":["Cardiff","Swansea","Newport","Wrexham","Bangor"],
+"Northern Ireland":["Belfast","Derry","Lisburn","Newry"]
+},
+CA:{
+"Alberta":["Calgary","Edmonton","Red Deer","Lethbridge"],"British Columbia":["Vancouver","Victoria","Surrey","Burnaby","Kelowna"],
+"Manitoba":["Winnipeg","Brandon"],"New Brunswick":["Fredericton","Moncton","Saint John"],
+"Newfoundland & Labrador":["St. John's","Corner Brook"],"Northwest Territories":["Yellowknife"],
+"Nova Scotia":["Halifax","Sydney"],"Nunavut":["Iqaluit"],
+"Ontario":["Toronto","Ottawa","Mississauga","Hamilton","London (ON)","Kitchener","Windsor","Brampton"],
+"Prince Edward Island":["Charlottetown","Summerside"],"Quebec":["Montreal","Quebec City","Laval","Gatineau","Sherbrooke"],
+"Saskatchewan":["Saskatoon","Regina"],"Yukon":["Whitehorse"]
+},
+AU:{
+"New South Wales":["Sydney","Newcastle","Wollongong","Central Coast","Tweed Heads"],
+"Victoria":["Melbourne","Geelong","Ballarat","Bendigo"],
+"Queensland":["Brisbane","Gold Coast","Sunshine Coast","Townsville","Cairns","Toowoomba"],
+"Western Australia":["Perth","Fremantle","Bunbury"],"South Australia":["Adelaide","Mount Gambier"],
+"Tasmania":["Hobart","Launceston"],"Northern Territory":["Darwin","Alice Springs"],
+"Australian Capital Territory":["Canberra"]
+},
+AE:{
+"Abu Dhabi":["Abu Dhabi","Al Ain"],"Dubai":["Dubai","Jebel Ali"],"Sharjah":["Sharjah","Khor Fakkan"],
+"Ajman":["Ajman"],"Ras Al Khaimah":["Ras Al Khaimah"],"Fujairah":["Fujairah"],"Umm Al Quwain":["Umm Al Quwain"]
+},
+SG:{"Singapore":["Singapore City","Jurong","Tampines","Woodlands","Bedok"]},
+JP:{
+"Tokyo":["Tokyo","Hachioji","Machida"],"Osaka":["Osaka","Sakai","Higashiosaka"],
+"Kanagawa":["Yokohama","Kawasaki","Kamakura","Yokosuka"],"Aichi":["Nagoya","Toyota"],
+"Hokkaido":["Sapporo","Hakodate","Asahikawa","Otaru"],"Fukuoka":["Fukuoka","Kitakyushu"],
+"Kyoto":["Kyoto","Uji"],"Hyogo":["Kobe","Himeji","Nishinomiya"],"Saitama":["Saitama","Kawagoe"],
+"Chiba":["Chiba","Funabashi","Narita"],"Hiroshima":["Hiroshima","Fukuyama"],"Miyagi":["Sendai"],
+"Shizuoka":["Shizuoka","Hamamatsu"],"Okinawa":["Naha"],"Nara":["Nara"]
+}
+};
+
+/* ---------- init dropdowns ---------- */
+const cSel=document.getElementById('country'),sSel=document.getElementById('state'),ctSel=document.getElementById('city'),
+      sInp=document.getElementById('stateT'),cInp=document.getElementById('cityT'),
+      dialMe=document.getElementById('dialme'),
+      dialMon=document.getElementById('dialMon');
+
+COUNTRIES.forEach(c=>{
+  const label=FLAGF(c[1])+' '+c[0]+' (+'+c[2]+')';
+  cSel.add(new Option(label,c[1]));
+  dialMe.add(new Option(label,c[1]));
+  dialMon.add(new Option(label,c[1]));
+});
+dialMe.value='IN'; dialMon.value='IN'; regenCode();
+
+function onCountry(){
+  const cc=cSel.value;
+  renderRegion(cc);
+  if(cc)syncPhones(cc);
+}
+function renderRegion(cc){
+  const data=REGIONS[cc];
+  const hasList=!!data;
+  sSel.classList.toggle('hidden',!hasList); ctSel.classList.toggle('hidden',!hasList);
+  sInp.classList.toggle('hidden',hasList);  cInp.classList.toggle('hidden',hasList);
+  sSel.innerHTML='<option value="">State…</option>'; ctSel.innerHTML='<option value="">City…</option>';
+  if(hasList)Object.keys(data).forEach(s=>sSel.add(new Option(s,s)));
+  document.getElementById('locnote').textContent = hasList
+    ? 'State & city lists included here. Pincode auto-verifies in the real app.'
+    : 'This country uses typed state & city in this rough version — the real app ships the complete world database via API.';
+}
+function fillCities(){
+  ctSel.innerHTML='<option value="">City…</option>';
+  const lv=REGIONS[cSel.value]?.[sSel.value];
+  if(lv)lv.forEach(c=>ctSel.add(new Option(c,c)));
+}
+
+/* phone rows: location country → auto-set both; manual change updates flag instantly */
+function syncPhones(cc){dialMe.value=cc;upd(dialMe,'flagme');}
+function upd(sel,flagId){document.getElementById(flagId).textContent=FLAGF(sel.value);}
+
+function detectMe(){
+  document.getElementById('detectst').textContent='📡 Detected (demo): Aminabad, Lucknow, UP 226001 — 3 nearest hospitals auto-picked ↑';
+  cSel.value='IN'; onCountry();
+  sSel.value='Uttar Pradesh'; fillCities(); ctSel.value='Lucknow';
+  document.getElementById('pin').value='226001';
+  document.getElementById('hosplist').scrollIntoView({behavior:'smooth'});
+}
+
+function readyCheck(){document.getElementById('proceed').classList.toggle('ready',document.getElementById('gd').checked);}
+
+/* ---------- page 3 : carry details + create password ---------- */
+function goSetPass(){
+  if(!document.getElementById('gd').checked){alert('Please accept the guidelines first (checkbox at the bottom).');return;}
+  const cc=dialMe.value, ctry=COUNTRIES.find(c=>c[1]===cc);
+  const dial=ctry?('+'+ctry[2]):'';
+  const num=document.getElementById('fPhone').value.trim()||'(not entered)';
+  document.getElementById('sFlag').textContent=FLAGF(cc);
+  document.getElementById('sPhone').textContent=dial+'  '+num;
+  document.getElementById('sEmail').textContent=document.getElementById('fEmail').value.trim()||'(not entered)';
+  document.getElementById('page2').classList.add('hidden');
+  document.getElementById('page3').classList.remove('hidden');
+  window.scrollTo(0,0);
+}
+function goBack3(){document.getElementById('page3').classList.add('hidden');document.getElementById('page2').classList.remove('hidden');window.scrollTo(0,0);}
+
+function togglePw(){
+  const a=document.getElementById('pw1'),b=document.getElementById('pw2');
+  const t=a.type==='password'?'text':'password';a.type=t;b.type=t;
+}
+function pwCheck(){
+  const a=document.getElementById('pw1').value,b=document.getElementById('pw2').value,m=document.getElementById('pwmsg');
+  const ok=a.length>=8&&a===b&&b.length>0;
+  if(!b){m.textContent='Retype the same password.';m.style.color='var(--muted)';}
+  else if(a.length<8){m.textContent='✕ Password needs at least 8 characters.';m.style.color='var(--muted)';}
+  else if(!ok){m.textContent='✕ Passwords do not match.';m.style.color='var(--muted)';}
+  else{m.textContent='✓ Passwords match';m.style.color='var(--ok)';}
+  document.getElementById('create').classList.toggle('ready',ok);
+}
+document.getElementById('pw1').addEventListener('input',pwCheck);
+document.getElementById('pw2').addEventListener('input',pwCheck);
+function createAccount(){
+  if(!document.getElementById('create').classList.contains('ready')){alert('Please set a valid password first.');return;}
+  document.getElementById('page3').classList.add('hidden');
+  document.getElementById('page8').classList.remove('hidden');window.scrollTo(0,0);
+}
+
+/* ---------- page 4 : user login ---------- */
+function goUserLogin(){document.getElementById('page1').classList.add('hidden');document.getElementById('page4').classList.remove('hidden');window.scrollTo(0,0);}
+function goMonitorLogin(){document.getElementById('page1').classList.add('hidden');document.getElementById('page7').classList.remove('hidden');window.scrollTo(0,0);}
+function goBack4(){document.getElementById('page4').classList.add('hidden');document.getElementById('page1').classList.remove('hidden');}
+function setLMode(m){
+  document.getElementById('lPw').classList.toggle('hidden',m==='otp');
+  document.getElementById('lOtp').classList.toggle('hidden',m==='pw');
+  document.getElementById('tabPw').classList.toggle('on',m==='pw');
+  document.getElementById('tabOtp').classList.toggle('on',m==='otp');
+}
+function toggleLp(){const i=document.getElementById('lpw');i.type=i.type==='password'?'text':'password';}
+function sendOtp(){document.getElementById('otpst').textContent='📨 OTP sent (demo) — type any 6 digits.';}
+document.querySelectorAll('.otp input').forEach((b,i,arr)=>{
+  b.addEventListener('input',()=>{b.value=b.value.replace(/\D/g,'');if(b.value&&arr[i+1])arr[i+1].focus();});
+});
+function lReady(){document.getElementById('loginBtn').classList.toggle('ready',document.getElementById('lgd').checked);}
+function doUserLogin(){
+  if(!document.getElementById('lgd').checked){alert('Please accept the guidelines first.');return;}
+  document.getElementById('page4').classList.add('hidden');
+  document.getElementById('page8').classList.remove('hidden');window.scrollTo(0,0);
+}
+
+/* ---------- page 5 : monitor sign-up ---------- */
+function goMonitorSignup(){document.getElementById('page1').classList.add('hidden');document.getElementById('page5').classList.remove('hidden');window.scrollTo(0,0);}
+function goBack5(){document.getElementById('page5').classList.add('hidden');document.getElementById('page1').classList.remove('hidden');}
+function mReady(){document.getElementById('mProceed').classList.toggle('ready',document.getElementById('mgd').checked);}
+/* monitor sign-up → invite code/link tabs + page 6 password */
+function setMInviteMode(m){
+  document.getElementById('mInvCode').classList.toggle('hidden',m==='link');
+  document.getElementById('mInvLink').classList.toggle('hidden',m==='code');
+  document.getElementById('mCode').classList.toggle('on',m==='code');
+  document.getElementById('mLink').classList.toggle('on',m==='link');
+}
+function goMonitorPass(){
+  if(!document.getElementById('mgd').checked){alert('Please accept the guidelines first.');return;}
+  const cc=dialMon.value, ctry=COUNTRIES.find(c=>c[1]===cc);
+  const dial=ctry?('+'+ctry[2]):'';
+  document.getElementById('mFlag').textContent=FLAGF(cc);
+  document.getElementById('mSPhone').textContent=dial+'  '+(document.getElementById('mPhone').value.trim()||'(not entered)');
+  document.getElementById('mSEmail').textContent=document.getElementById('mEmail').value.trim()||'(not entered)';
+  document.getElementById('page5').classList.add('hidden');
+  document.getElementById('page6').classList.remove('hidden');window.scrollTo(0,0);
+}
+function goBack6(){document.getElementById('page6').classList.add('hidden');document.getElementById('page5').classList.remove('hidden');window.scrollTo(0,0);}
+function togglePwM(){const a=document.getElementById('mpw1'),b=document.getElementById('mpw2');const t=a.type==='password'?'text':'password';a.type=t;b.type=t;}
+function pwCheckM(){
+  const a=document.getElementById('mpw1').value,b=document.getElementById('mpw2').value,m=document.getElementById('mpwmsg');
+  const ok=a.length>=8&&a===b&&b.length>0;
+  if(!b){m.textContent='Retype the same password.';m.style.color='var(--muted)';}
+  else if(a.length<8){m.textContent='✕ Password needs at least 8 characters.';m.style.color='var(--muted)';}
+  else if(!ok){m.textContent='✕ Passwords do not match.';m.style.color='var(--muted)';}
+  else{m.textContent='✓ Passwords match';m.style.color='var(--ok)';}
+  document.getElementById('mCreate').classList.toggle('ready',ok);
+}
+document.getElementById('mpw1').addEventListener('input',pwCheckM);
+document.getElementById('mpw2').addEventListener('input',pwCheckM);
+function createMonitor(){
+  if(!document.getElementById('mCreate').classList.contains('ready')){alert('Please set a valid password first.');return;}
+  alert('✅ Monitor account created! Next: HOME SCREEN (dashboard) — baad mein lock karenge');
+}
+
+/* monitor login (page 7) — same flow as user login */
+function goBack7(){document.getElementById('page7').classList.add('hidden');document.getElementById('page1').classList.remove('hidden');}
+function setMLMode(m){
+  document.getElementById('mlPw').classList.toggle('hidden',m==='otp');
+  document.getElementById('mlOtp').classList.toggle('hidden',m==='pw');
+  document.getElementById('mtabPw').classList.toggle('on',m==='pw');
+  document.getElementById('mtabOtp').classList.toggle('on',m==='otp');
+}
+function toggleMLp(){const i=document.getElementById('mlpw');i.type=i.type==='password'?'text':'password';}
+function sendMOtp(){document.getElementById('motpst').textContent='📨 OTP sent (demo) — type any 6 digits.';}
+function mlReady(){document.getElementById('mloginBtn').classList.toggle('ready',document.getElementById('mlgd').checked);}
+function doMonitorLogin(){
+  if(!document.getElementById('mlgd').checked){alert('Please accept the guidelines first.');return;}
+  alert('✅ Logged in! Next: Monitor dashboard — baad mein lock karenge');
+}
+
+/* ---------- page 8/9 : elder home + full chat ---------- */
+function goChat(mode){
+  document.getElementById('page8').classList.add('hidden');
+  document.getElementById('page9').classList.remove('hidden');window.scrollTo(0,0);
+  if(mode==='voice'){
+    addMsg('me','🎙️ (you said) “My knee has been hurting since morning…”');
+    setTimeout(()=>addMsg('ai',curLang==='hi'?'समझ गए मोहन जी। घुटने का दर्द — पहले थोड़ा आराम कीजिए, गरम सिकाई से आराम मिलेगा। क्या डॉक्टर से बात करवा दूँ? 📞':'I understand, Mohan ji. Knee pain — get some rest first; a warm compress usually helps. Shall I arrange a doctor call? 📞'),700);
+  } else if(mode && mode!=='type'){
+    addMsg('me',mode);
+    setTimeout(()=>aiReply(mode),700);
+  } else {
+    setTimeout(()=>document.getElementById('chatInp').focus(),150);
+  }
+}
+function goHome(){document.getElementById('page9').classList.add('hidden');document.getElementById('page8').classList.remove('hidden');}
+function toggleSide(){
+  const s=document.getElementById('side');s.classList.toggle('open');
+  document.getElementById('edge').textContent=s.classList.contains('open')?'«':'»';
+  document.getElementById('edge').title=s.classList.contains('open')?'Hide menu':'Show menu';
+}
+function addMsg(who,txt){
+  const d=document.createElement('div');d.className='msg '+who;d.textContent=txt;
+  const m=document.getElementById('msgs');m.appendChild(d);m.scrollTop=m.scrollHeight;
+}
+function aiReply(txt){
+  const t=txt.toLowerCase();
+  const R={ /* default English; Hindi replies too — other languages fall back to English in this rough */
+    help :{en:"Help is on the way! 🚨 For a real emergency, press the big red Emergency tile — or just say “yes”.",hi:'मदद आ रही है! 🚨 सच्ची emergency हो तो नीचे बड़ा लाल Emergency tile दबा दीजिए — या बस “हाँ” बोलिए।'},
+    med  :{en:"Today 9 AM: Metformin 500mg — after breakfast. I reminded you at nine. ✅ Have you taken it?",hi:'आज सुबह 9 बजे: Metformin 500mg — नाश्ते के बाद। मैंने ठीक समय पर याद दिलाया था। ✅ ले ली ना?'},
+    bp   :{en:"Yesterday's BP was 128/82 — perfectly normal, Mohan ji. 🩺 Tomorrow's reading at 8 AM — I'll remind you.",hi:'आपका कल का BP: 128/82 — बिल्कुल नॉर्मल है मोहन जी। 🩺 कल सुबह 8 बजे reading लेंगे, मैं याद दिला दूँगा।'},
+    call :{en:"Calling Priya… 📞 (demo) — in the real app a voice call opens right here.",hi:'Priya को call लगाया जा रहा है… 📞 (demo) — असली app में यहीं से voice call खुल जाएगा।'},
+    pain :{en:"I'm sorry you're in pain. 🩺 If it gets worse, your Emergency Card is one tap away. First — where is the pain?",hi:'दर्द सुनकर बुरा लगा। 🩺 ज़्यादा बढ़े तो Emergency Card एक tap दूर है। पहले बताइए — दर्द कहाँ है?'},
+    ok   :{en:"Noted, Mohan ji. 🙏 Anything else? I'm right here.",hi:'ठीक है मोहन जी, note कर लिया। 🙏 और कुछ? मैं यहीं हूँ।'}
+  };
+  const L=curLang==='hi'?'hi':'en';let key='ok';
+  if(/madad|help|bachao|gir|gira|sos|emergency/.test(t))        key='help';
+  else if(/dawai|medicine|tablet|goli|med/.test(t))             key='med';
+  else if(/bp|blood pressure/.test(t))                          key='bp';
+  else if(/phone|call|bulao|beta|priya|family/.test(t))         key='call';
+  else if(/dard|pain|tabiyat|hurt|knee|fever|bukhar/.test(t))   key='pain';
+  addMsg('ai',R[key][L]);
+}
+function sendMsg(){
+  const i=document.getElementById('chatInp');const t=i.value.trim();
+  if(!t)return;i.value='';addMsg('me',t);setTimeout(()=>aiReply(t),700);
+}
+function voice(){
+  addMsg('me','🎙️ (you said) “Yes, I have taken my medicine”');
+  setTimeout(()=>addMsg('ai',curLang==='hi'?'बहुत अच्छा! ✅ आज की Metformin done। शाम की दवाई 7 बजे — मैं आकर बुला दूँगा।':'Wonderful! ✅ Today\u2019s Metformin done. The evening dose is at 7 PM — I\u2019ll come remind you.'),700);
+}
+
+/* ---------- invite code/link generator (elder signup, section 6) ---------- */
+function genCode(){
+  const A='ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; /* no confusing chars (0/O, 1/I) */
+  return 'SVN-'+Array.from({length:4},()=>A[Math.floor(Math.random()*A.length)]).join('');
+}
+function regenCode(){
+  const c=genCode();
+  document.getElementById('icodeTxt').textContent=c;
+  document.getElementById('ilinkTxt').textContent='saavren.app/join/'+c;
+}
+function setInviteMode(m){
+  document.getElementById('invCode').classList.toggle('hidden',m==='link');
+  document.getElementById('invLink').classList.toggle('hidden',m==='code');
+  document.getElementById('iCode').classList.toggle('on',m==='code');
+  document.getElementById('iLink').classList.toggle('on',m==='link');
+}
+function copyTxt(id,btn){
+  const t=document.getElementById(id).textContent;
+  if(navigator.clipboard)navigator.clipboard.writeText(t);
+  btn.textContent='Copied ✓';setTimeout(()=>btn.textContent='Copy',1500);
+}
+
+/* ---------- interactive feature panels ---------- */
+const PANELS={
+ health:{t:'🩺 Health dashboard',body:`
+  <div class="hrow"><div class="stat"><b>128/82</b><span>BP 🩺 · normal</span></div>
+  <div class="stat"><b>105</b><span>Sugar (fasting) mg/dL</span></div></div>
+  <div class="hrow"><div class="stat"><b>74</b><span>Heart ❤️ bpm</span></div>
+  <div class="stat"><b>98%</b><span>SpO₂ 🫁</span></div></div>
+  <div class="eg">Updated today 9:05 AM · next reading tomorrow 8 AM — I'll remind you by voice.</div>`},
+ meds:{t:'💊 Medicines today',body:`
+  <div class="mrow"><button class="tick done" onclick="tickMed(this)">✓</button><div class="mi"><b>Metformin 500mg</b><div class="sm">9:00 AM, after breakfast — <span class="mst">taken ✓</span></div></div></div>
+  <div class="mrow"><button class="tick" onclick="tickMed(this)"></button><div class="mi"><b>Vitamin D3</b><div class="sm">2:00 PM, with lunch — <span class="mst">pending</span></div></div></div>
+  <div class="mrow"><button class="tick" onclick="tickMed(this)"></button><div class="mi"><b>Amlodipine 5mg</b><div class="sm">7:00 PM, before dinner — <span class="mst">pending</span></div></div></div>
+  <div class="eg">Tap ✓ to mark a dose — Saavren stops reminding once it's marked, and your family sees it too.</div>`},
+ family:{t:'📞 Family & contacts',body:`
+  <div class="fam"><div class="av">P</div><div><b>Priya Verma</b><div style="font-size:12px;color:var(--muted)">Daughter · Monitor</div></div><button class="callb" onclick="callFam('Priya')">Call 📞</button></div>
+  <div class="fam"><div class="av">R</div><div><b>Rahul Verma</b><div style="font-size:12px;color:var(--muted)">Son · Monitor</div></div><button class="callb" onclick="callFam('Rahul')">Call 📞</button></div>
+  <div class="fam"><div class="av">D</div><div><b>Dr. Sharma</b><div style="font-size:12px;color:var(--muted)">Family doctor (GP)</div></div><button class="callb" onclick="callFam('Dr. Sharma')">Call 📞</button></div>
+  <div class="eg">Free in-app voice calls (demo). Emergency calls jump to these contacts automatically.</div>`},
+ ecard:{t:'🪪 Emergency card',body:`
+  <div class="ecard"><div class="et">SAAVREN · EMERGENCY CARD</div>
+   <p><b>Name:</b> Mohan Lal Verma&nbsp;&nbsp;·&nbsp;&nbsp;<b>Age:</b> 72<br>
+   <b>Blood group:</b> B+<br>
+   <b>Conditions:</b> Diabetes, High BP<br>
+   <b>Hospital No.1:</b> Balrampur Hospital (1.2 km)<br>
+   <b>Monitor:</b> Priya Verma · +91 98XXX XXXXX</p></div>
+  <div class="eg" style="margin-top:10px">In an emergency this card is sent to the hospital + family instantly — one tap.</div>`},
+ settings:{t:'⚙️ Settings',body:()=>{
+   const code=(document.getElementById('icodeTxt')||{}).textContent||'SVN-8F2K';
+   return `
+  <label style="display:flex;justify-content:space-between;align-items:center;font-size:15px;margin-bottom:14px">Spoken replies (voice out) <input type="checkbox" checked></label>
+  <label style="display:block;font-size:15px;margin-bottom:6px">Speech speed</label>
+  <input type="range" min="0.6" max="1.4" step="0.1" value="1" style="width:100%">
+  <hr style="border:none;border-top:1px solid var(--line);margin:18px 0">
+  <div class="eg">Invite family to monitor you:</div>
+  <div class="invbox" style="margin-top:8px"><span>${code}</span><button class="mini" onclick="copyTxt('icodeTxt',this)">Copy</button></div>
+  <div class="eg" style="margin-top:6px">Link form: saavren.app/join/${code} · same code from sign-up (field 6).</div>
+  <hr style="border:none;border-top:1px solid var(--line);margin:18px 0">
+  <button class="btn ghost" style="margin-top:0" onclick="signOut()">Sign out</button>`;}},
+ sos:{t:'🚨 Emergency',body:`
+  <div class="eg" style="font-size:14px;margin-bottom:12px">Press below to see what a real trigger looks like (demo — nothing is actually sent).</div>
+  <button class="sendBtn" style="background:#dc2626" id="sosGo" onclick="sosStart()">⚡ Trigger SOS demo</button>
+  <div id="sosOut"></div>
+  <button class="mini hidden" id="sosCan" style="margin-top:10px" onclick="sosCancel()">Cancel “I'm OK”</button>`},
+ activity:{t:'🕓 Recent activity',body:`
+  <div class="tl">
+   <div class="t"><b>☀️ Morning check-in done</b><span>9:00 AM — “I'm fine” said by voice</span></div>
+   <div class="t"><b>💊 Metformin taken</b><span>9:05 AM</span></div>
+   <div class="t"><b>🩺 BP reminder sent</b><span>11:30 AM</span></div>
+   <div class="t"><b>📞 Priya called</b><span>12:15 PM · 4 min</span></div>
+   <div class="t"><b>🚶 Afternoon walk detected</b><span>1:02 PM · simulated sensor</span></div>
+  </div>
+  <div class="eg">Monitors (family) see this same timeline on their dashboard.</div>`},
+ notifs:{t:'🔔 Alerts & messages',body:`
+  <div class="nrow urgent"><span class="ni">🚨</span><div class="mi"><b>SOS — “Madad, main gir gaya hoon”</b><div style="font-size:12px;color:var(--muted)">Today 2:07 PM · Severity 9 · Fall · Balrampur Hospital notified</div></div><span class="uni"></span></div>
+  <div class="nrow"><span class="ni">💊</span><div class="mi"><b>Medicine pending</b><div style="font-size:12px;color:var(--muted)">Vitamin D3 due 2:00 PM — not yet marked taken</div></div><span class="uni"></span></div>
+  <div class="nrow"><span class="ni">🩺</span><div class="mi"><b>New BP reading: 128/82 (normal)</b><div style="font-size:12px;color:var(--muted)">Today 9:05 AM</div></div></div>
+  <div class="nrow"><span class="ni">💬</span><div class="mi"><b>Message from Mohan ji</b><div style="font-size:12px;color:var(--muted)">“Call me when free” · 12:40 PM</div></div></div>
+  <div class="nrow"><span class="ni">✅</span><div class="mi"><b>Morning check-in done</b><div style="font-size:12px;color:var(--muted)">9:00 AM — voice: “I'm fine”</div></div></div>
+  <button class="sendBtn" onclick="markAllRead()">Mark all as read ✓</button>
+  <div class="eg" style="margin-top:8px">SOS arrives as push + SMS + call simultaneously. Others are push-only.</div>`}
+};
+function openPanel(k){
+  sosCancel(true);
+  const P=PANELS[k];
+  document.getElementById('pTitle').textContent=P.t;
+  document.getElementById('pBody').innerHTML=(typeof P.body==='function')?P.body():P.body;
+  document.getElementById('ovl').classList.remove('hidden');
+}
+function closePanel(){document.getElementById('ovl').classList.add('hidden');sosCancel(true);}
+function tickMed(b){
+  const on=b.classList.toggle('done');b.textContent=on?'✓':'';
+  const st=b.parentElement.querySelector('.mst');if(st)st.textContent=on?'taken ✓':'pending';
+}
+function callFam(n){alert('📞 Calling '+n+'… (demo) — voice call will open here.');}
+function signOut(){
+  ['page6','page7','page8','page9','page3','page4','page2','page5','page10','page11'].forEach(p=>document.getElementById(p).classList.add('hidden'));
+  closePanel();document.getElementById('page1').classList.remove('hidden');window.scrollTo(0,0);
+}
+/* sos demo countdown */
+let sosTimer=null,sosN=0;
+function sosStart(){
+  sosN=5;
+  document.getElementById('sosGo').classList.add('hidden');
+  document.getElementById('sosCan').classList.remove('hidden');
+  const out=document.getElementById('sosOut');
+  out.innerHTML='⏳ Dispatching alert in <b>'+sosN+'</b>… speak “Cancel” or tap below if you are OK.';
+  sosTimer=setInterval(()=>{
+    sosN--;
+    if(sosN>0){out.innerHTML='⏳ Dispatching alert in <b>'+sosN+'</b>… speak “Cancel” or tap below if you are OK.';}
+    else{
+      clearInterval(sosTimer);sosTimer=null;
+      document.getElementById('sosCan').classList.add('hidden');
+      document.getElementById('sosGo').classList.remove('hidden');
+      out.innerHTML='🚨 <b>Alert sent!</b> Priya (daughter) + 🏥 Balrampur Hospital notified with your Emergency Card. <span style="color:var(--muted)">(demo)</span>';
+    }
+  },1000);
+}
+function sosCancel(silent){
+  if(sosTimer){clearInterval(sosTimer);sosTimer=null;
+    const out=document.getElementById('sosOut');if(out&&!silent)out.innerHTML='✅ Cancelled — glad you are fine, Mohan ji!';
+  }
+  const can=document.getElementById('sosCan'),go=document.getElementById('sosGo');
+  if(can)can.classList.add('hidden');if(go)go.classList.remove('hidden');
+}
+
+/* ---------- page 10/11 : monitor home + monitor chat ---------- */
+function markAllRead(){
+  document.querySelectorAll('.uni').forEach(d=>d.remove());
+  const b=document.getElementById('mBadge');if(b)b.style.display='none';
+}
+function mGoChat(mode){
+  document.getElementById('page10').classList.add('hidden');
+  document.getElementById('page11').classList.remove('hidden');window.scrollTo(0,0);
+  if(mode==='voice'){
+    mAddMsg('me','🎙️ (you said) “Is everything fine at home?”');
+    setTimeout(()=>mAddMsg('ai',curLang==='hi'?'सब ठीक है प्रिया 🟢 — मोहन जी का check-in 9 बजे हुआ, दवाइयाँ समय पर ली गईं। आखिरी BP: 128/82 (normal).':'All well at home, Priya 🟢 — Mohan ji checked in at 9 AM, medicines were on time. Latest BP: 128/82 (normal).'),700);
+  } else if(mode && mode!=='type'){
+    mAddMsg('me',mode);
+    setTimeout(()=>mAiReply(mode),700);
+  } else {
+    setTimeout(()=>document.getElementById('mchatInp').focus(),150);
+  }
+}
+function mGoHome(){document.getElementById('page11').classList.add('hidden');document.getElementById('page10').classList.remove('hidden');}
+function mToggleSide(){
+  const s=document.getElementById('mside');s.classList.toggle('open');
+  document.getElementById('medge').textContent=s.classList.contains('open')?'«':'»';
+}
+function mAddMsg(who,txt){
+  const d=document.createElement('div');d.className='msg '+who;d.textContent=txt;
+  const m=document.getElementById('mmsgs');m.appendChild(d);m.scrollTop=m.scrollHeight;
+}
+function mAiReply(txt){
+  const t=txt.toLowerCase();
+  const R={
+    today:{en:"Mohan ji had a calm morning ✅ — check-in at 9 AM, breakfast medicines on time. Latest BP: 128/82 (normal). No emergencies 🟢.",
+           hi:'मोहन जी की सुबह शांत रही ✅ — 9 बजे check-in, नाश्ते की दवाइयाँ समय पर। आखिरी BP: 128/82 (normal)। कोई emergency नहीं 🟢।'},
+    med  :{en:"Metformin taken at 9:05 AM ✅. Pending: Vitamin D3 (2 PM) and Amlodipine (7 PM) — I'll remind him by voice exactly on time.",
+           hi:'Metformin सुबह 9:05 पर ली गई ✅। बाकी: Vitamin D3 (2 बजे) और Amlodipine (7 बजे) — समय पर मैं आवाज़ से याद दिलाऊँगा।'},
+    alert:{en:"Today: 1 SOS demo alert (2:07 PM, handled) 📞 + 1 pending-medicine note. No real emergency 🟢. Full list is under 🔔 Alerts.",
+           hi:'आज: 1 SOS demo alert (दोपहर 2:07, संभल गया) 📞 + 1 दवाई-बाकी note। कोई असली emergency नहीं 🟢। पूरी list 🔔 Alerts में है।'},
+    sos  :{en:"If he presses SOS, you instantly get push + SMS + call together, with his Emergency Card and live location. Then the hospital is notified automatically. (demo)",
+           hi:'अगर वो SOS दबाते हैं, आपको एक साथ push + SMS + call आता है — उनके Emergency Card और live location के साथ। फिर hospital अपने आप informed होता है। (demo)'},
+    ok   :{en:"Noted, Priya 🙏 Anything else about Mohan ji?",hi:'ठीक है प्रिया 🙏 मोहन जी के बारे में और कुछ?'}
+  };
+  const L=curLang==='hi'?'hi':'en';let key='ok';
+  if(/today|status|how is|morning|fine/.test(t))              key='today';
+  else if(/medicine|med|tablet|dawai|taken/.test(t))           key='med';
+  else if(/alert|notification|alarm|any alert/.test(t))        key='alert';
+  else if(/sos|emergency|madad|help|gir|fell/.test(t))         key='sos';
+  mAddMsg('ai',R[key][L]);
+}
+function mSendMsg(){
+  const i=document.getElementById('mchatInp');const t=i.value.trim();
+  if(!t)return;i.value='';mAddMsg('me',t);setTimeout(()=>mAiReply(t),700);
+}
+function mvoice(){
+  mAddMsg('me','🎙️ (you said) “Please call Mohan ji now”');
+  setTimeout(()=>mAddMsg('ai',curLang==='hi'?'मोहन जी को call लगाया जा रहा है… 📞 (demo) — असली app में यहाँ से direct voice call खुलता है।':'Calling Mohan ji… 📞 (demo) — in the real app a voice call opens right here.'),700);
+}
+
+/* ---------- page 12 : health dashboard ---------- */
+let healthFrom='page8';
+function openHealth(){
+  ['page8','page10','page9','page11'].forEach(p=>{if(!document.getElementById(p).classList.contains('hidden'))healthFrom=p;});
+  document.getElementById(healthFrom).classList.add('hidden');
+  document.getElementById('page12').classList.remove('hidden');
+  calcBMI();window.scrollTo(0,0);
+}
+function backFromHealth(){
+  document.getElementById('page12').classList.add('hidden');
+  document.getElementById(healthFrom).classList.remove('hidden');
+}
+function calcBMI(){
+  const w=parseFloat(document.getElementById('wt').value)||0, h=parseFloat(document.getElementById('ht').value)||0;
+  const n=document.getElementById('bmiN'),c=document.getElementById('bmiCat');
+  if(w<=0||h<=0){n.textContent='—';c.textContent='enter values';c.style.background='';c.style.color='var(--muted)';return;}
+  const bmi=w/((h/100)*(h/100));
+  n.textContent=bmi.toFixed(1);
+  let cat,fg,bgc;
+  if(bmi<18.5){cat='Underweight';fg='#3b82f6';bgc='rgba(59,130,246,.15)';}
+  else if(bmi<25){cat='Normal ✅';fg='#16a34a';bgc='rgba(34,197,94,.15)';}
+  else if(bmi<30){cat='Overweight';fg='#d97706';bgc='rgba(245,158,11,.15)';}
+  else{cat='Obese';fg='#dc2626';bgc='rgba(220,38,38,.12)';}
+  c.textContent=cat;c.style.color=fg;c.style.background=bgc;
+}
+function ageFromDob(){
+  const v=document.getElementById('dob').value;if(!v)return;
+  const d=new Date(v),t=new Date();
+  let a=t.getFullYear()-d.getFullYear();const m=t.getMonth()-d.getMonth();
+  if(m<0||(m===0&&t.getDate()<d.getDate()))a--;
+  document.getElementById('ageShow').textContent=a;
+}
+function toast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.remove('hidden');
+  setTimeout(()=>t.classList.add('hidden'),1800);
+}
+function saveHealth(){toast('✅ Saved — Emergency Card updated automatically');}
+</script>
+</body>
+</html>

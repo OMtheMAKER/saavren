@@ -1,0 +1,12 @@
+{
+  "appId": "com.saavren.app",
+  "appName": "Saavren",
+  "webDir": "frontend/dist",
+  "server": {
+    "url": "https://REPLACE-ME.hf.space",
+    "cleartext": false
+  },
+  "android": {
+    "allowMixedContent": false
+  }
+}

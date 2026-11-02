@@ -1,0 +1,15 @@
+.env
+node_modules/
+dist/
+__pycache__/
+*.pyc
+data/
+
+# accounts database (created at runtime, holds password hashes)
+saavren.db
+saavren.db-wal
+saavren.db-shm
+
+.venv/
+!frontend/dist/
+!frontend/dist/**
