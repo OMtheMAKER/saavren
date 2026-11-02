@@ -63,7 +63,12 @@ export default function App() {
 
   const [view, setView] = useState('home')
   const [panel, setPanel] = useState(null)
-  const [sideOpen, setSideOpen] = useState(true)
+  // Phones show the side rail as a swipe drawer; wider screens keep it docked.
+  const [narrow, setNarrow] = useState(
+    () => typeof window !== 'undefined' && !!window.matchMedia &&
+      window.matchMedia('(max-width: 720px)').matches
+  )
+  const [sideOpen, setSideOpen] = useState(!narrow)
   const [msgs, setMsgs] = useState([])
   const [draft, setDraft] = useState('')
   const [typing, setTyping] = useState(false)
@@ -431,6 +436,7 @@ export default function App() {
   }
 
   const openConversation = async (id) => {
+    if (narrow) setSideOpen(false)
     setActiveId(id)
     try {
       const c = await api.conversation(id)
@@ -442,7 +448,10 @@ export default function App() {
     } catch (e) { /* ignore */ }
   }
 
-  const newChat = () => { setActiveId(null); setMsgs([]); setView('chat') }
+  const newChat = () => {
+    if (narrow) setSideOpen(false)
+    setActiveId(null); setMsgs([]); setView('chat')
+  }
 
   /* ------------------------------------------------------ D3: alarm ----- */
   const raiseFall = useCallback(async (confidence, source, features) => {
@@ -658,10 +667,43 @@ export default function App() {
      One page, no router: without this the phone's back gesture closed the
      whole app. Every open layer gets a history entry, so back closes the top
      one — a panel first, then the screen under it. */
-  const onScreen = useRef({ view, panel })
-  onScreen.current = { view, panel }
+  const onScreen = useRef({ view, panel, sideOpen, narrow })
+  onScreen.current = { view, panel, sideOpen, narrow }
 
-  const canGoBack = !!panel || view !== 'home'
+  // rotating the phone or resizing the window switches between the two layouts
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 720px)')
+    const onChange = (e) => { setNarrow(e.matches); setSideOpen(!e.matches) }
+    mq.addEventListener('change', onChange)
+    return () => mq.removeEventListener('change', onChange)
+  }, [])
+
+  // picking anything out of the drawer closes it, or it would sit on top of
+  // whatever you just opened
+  useEffect(() => {
+    if (narrow && (panel || view !== 'home')) setSideOpen(false)
+  }, [panel, view, narrow])
+
+  const drawerOpen = narrow && sideOpen
+  const canGoBack = drawerOpen || !!panel || view !== 'home'
+
+  // open the drawer by dragging in from the left edge, close it by dragging back
+  const swipe = useRef(null)
+  const onTouchStart = (e) => {
+    const t = e.touches[0]
+    swipe.current = { x: t.clientX, y: t.clientY }
+  }
+  const onTouchEnd = (e) => {
+    const start = swipe.current
+    swipe.current = null
+    if (!start || !narrow) return
+    const t = e.changedTouches[0]
+    const dx = t.clientX - start.x
+    const dy = t.clientY - start.y
+    if (Math.abs(dx) < 55 || Math.abs(dy) > 70) return   // not a sideways swipe
+    if (dx > 0 && start.x < 44) setSideOpen(true)
+    else if (dx < 0) setSideOpen(false)
+  }
 
   // A ringing alarm or a running check-in must survive a stray back press.
   const blocking = !!(alarm || checkin)
@@ -669,12 +711,14 @@ export default function App() {
 
   // Keeps browser history in step with whatever is open, however it opened.
   useEffect(() => {
-    nav.sync(canGoBack ? (panel ? 2 : 1) : 0, () => {
+    const layers = drawerOpen ? 1 : (panel ? 2 : (view !== 'home' ? 1 : 0))
+    nav.sync(layers, () => {
       const s = onScreen.current
-      if (s.panel) setPanel(null)
+      if (s.sideOpen && s.narrow) setSideOpen(false)
+      else if (s.panel) setPanel(null)
       else if (s.view !== 'home') setView('home')
     })
-  }, [view, panel])
+  }, [view, panel, drawerOpen])
 
   useEffect(() => {
     nav.arm()
@@ -684,12 +728,18 @@ export default function App() {
   }, [])
 
   return (
-    <div className="app">
+    <div className="app" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
       {!family && (
-      <aside className={'side' + (sideOpen ? '' : ' collapsed')}>
+      <>
+      <aside className={'side' + (sideOpen ? ' open' : ' collapsed')}>
         <div className="brand">
           <div className="logo">S</div>
           <div><b>Saavren</b><span>{t('tagline')}</span></div>
+          {narrow && (
+            <button className="iconbtn" style={{ marginLeft: 'auto' }}
+                    onClick={() => setSideOpen(false)}
+                    title={t('close')} aria-label={t('close')}>✕</button>
+          )}
         </div>
         <button className="btn wide" onClick={newChat}>+ {t('new_chat')}</button>
         <div style={{ flex: 1, overflow: 'auto', marginTop: 6 }}>
@@ -711,6 +761,10 @@ export default function App() {
           {t('mic_watch')}
         </label>
       </aside>
+      {narrow && sideOpen && (
+        <div className="side-scrim" onClick={() => setSideOpen(false)} />
+      )}
+      </>
       )}
 
       <main className="main">

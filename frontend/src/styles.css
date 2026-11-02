@@ -232,8 +232,31 @@ a { color:inherit; }
   display:flex; gap:8px; background:var(--bg2); border:1px solid var(--line);
   border-radius:16px; padding:8px; box-shadow:var(--shadow); z-index:40;
 }
+/* ---------- phones: the side rail becomes a swipe drawer ----------
+   It used to be pinned open with no way to dismiss it, which swallowed the
+   whole screen — and the floating dock sat on top of the chat input. */
 @media (max-width:720px) {
-  .side { position:fixed; inset:0 auto 0 0; z-index:70; box-shadow:var(--shadow); }
+  .side {
+    position:fixed; inset:0 auto 0 0; z-index:70; box-shadow:var(--shadow);
+    width:80vw; max-width:300px; transform:translateX(-103%);
+    transition:transform .22s ease;
+  }
+  .side.collapsed { display:flex; }          /* keep the slide-out animation */
+  .side.open { transform:none; }
+  .side-scrim {
+    position:fixed; inset:0; z-index:65; background:rgba(8,10,13,.55);
+    animation:scrimfade .15s ease-out;
+  }
+  .dock { display:none; }
+  .msgs { padding-bottom:10px; }
+}
+@keyframes scrimfade { from { opacity:0 } to { opacity:1 } }
+
+/* On wider screens the dock still floats, so give the page room to clear it
+   instead of letting it cover the chat composer. */
+@media (min-width:721px) {
+  .view { padding-bottom:84px; }
+  .composer { padding-bottom:88px; }
 }
 
 /* ---------- D5: family monitor dashboard ---------- */

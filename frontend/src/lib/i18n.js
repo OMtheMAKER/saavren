@@ -19,6 +19,7 @@ const D = {
   voice_out:     {hi:'आवाज़ में जवाब', en:'Voice replies', bn:'ভয়েস উত্তর', ta:'குரல் பதில்கள்', te:'వాయిస్ సమాధానాలు', mr:'आवाज उत्तरे', gu:'અવાજ જવાબો', es:'Respuestas por voz', fr:'Réponses vocales'},
   persona:       {hi:'बोलने का अंदाज़', en:'Speaking style', bn:'কথার ধরন', ta:'பேசும் பாணி', te:'మాట్లాడే శైలి', mr:'बोलण्याची शैली', gu:'બોલવાની શૈલી', es:'Estilo de habla', fr:'Style de parole'},
   save:          {hi:'सहेजें', en:'Save', bn:'সংরক্ষণ', ta:'சேமி', te:'సేవ్', mr:'जतन करा', gu:'સાચવો', es:'Guardar', fr:'Enregistrer'},
+  close:         {hi:'बंद करें', en:'Close', bn:'বন্ধ করুন', ta:'மூடு', te:'మూసివేయి', mr:'बंद करा', gu:'બંધ કરો', es:'Cerrar', fr:'Fermer'},
   back:          {hi:'पीछे', en:'Back', bn:'পেছনে', ta:'பின்', te:'వెనుకకు', mr:'मागे', gu:'પાછળ', es:'Atrás', fr:'Retour'},
   cancel:        {hi:'रद्द', en:'Cancel', bn:'বাতিল', ta:'ரத்து', te:'రద్దు', mr:'रद्द', gu:'રદ', es:'Cancelar', fr:'Annuler'},
   delete:        {hi:'हटाएँ', en:'Delete', bn:'মুছুন', ta:'நீக்கு', te:'తొలగించు', mr:'काढा', gu:'કાઢી નાખો', es:'Eliminar', fr:'Supprimer'},
