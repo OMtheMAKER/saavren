@@ -1,11 +1,17 @@
 .env
 node_modules/
-dist/
 __pycache__/
 *.pyc
 data/
+.venv/
 
 # accounts database (created at runtime, holds password hashes)
 saavren.db
 saavren.db-wal
 saavren.db-shm
+
+# The built UI ships on purpose. The container serves frontend/dist directly,
+# so it must be in the repository — do NOT ignore it. (An earlier `dist/` rule
+# here silently dropped every newly built bundle and left a blank page.)
+!frontend/dist/
+!frontend/dist/**
