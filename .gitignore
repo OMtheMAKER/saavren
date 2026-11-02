@@ -15,4 +15,3 @@ saavren.db-shm
 # here silently dropped every newly built bundle and left a blank page.)
 !frontend/dist/
 !frontend/dist/**
-.venv/
