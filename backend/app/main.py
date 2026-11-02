@@ -16,10 +16,29 @@ from pydantic import BaseModel
 
 from . import ai, ai_extra, auth
 
-app = FastAPI(title="Saavren", version="0.8.1-back",
+app = FastAPI(title="Saavren", version="0.8.2-web",
               description="Voice-first emergency guardian & daily health companion.")
 
-DIST = Path(__file__).resolve().parent.parent.parent / "frontend" / "dist"
+def _web_dir() -> Path:
+    """Where the built UI lives.
+
+    Locally the package sits at <root>/backend/app, so three levels up is the
+    project root. Inside the container the layout is different, so instead of
+    counting `..` we walk up until a frontend/dist actually exists. Docker
+    deployments that keep a different layout can point SAAVREN_WEB_DIR at it.
+    """
+    override = os.getenv("SAAVREN_WEB_DIR")
+    if override:
+        return Path(override)
+    here = Path(__file__).resolve()
+    for base in here.parents:
+        candidate = base / "frontend" / "dist"
+        if candidate.is_dir():
+            return candidate
+    return here.parent.parent.parent / "frontend" / "dist"
+
+
+DIST = _web_dir()
 
 # --------------------------------------------------------------------------
 # Which language is this request in?
@@ -353,7 +372,7 @@ def _boot_banner() -> None:
 # --------------------------------------------------------------------------
 @app.get("/api/health")
 def health():
-    return {"ok": True, "service": "saavren", "version": "0.7.8",
+    return {"ok": True, "service": "saavren", "version": app.version,
             "asr": ai.asr_available(), "asr_mode": ai.asr_mode(),
             "asr_chain": ai.asr_chain(),
             "hf_token": ai.hf_token_status()[1],
@@ -1496,7 +1515,11 @@ def set_routine_alarm(body: AlarmIn):
 # --------------------------------------------------------------------------
 # Static frontend (must stay last)
 # --------------------------------------------------------------------------
-if DIST.exists():
+if not DIST.is_dir():
+    print(f"[saavren] no built UI at {DIST} - API only. "
+          "Run `npm run build` in frontend/, or set SAAVREN_WEB_DIR.")
+
+if DIST.is_dir():
     @app.get("/")
     def index():
         return FileResponse(DIST / "index.html")

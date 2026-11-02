@@ -9,7 +9,3 @@ data/
 saavren.db
 saavren.db-wal
 saavren.db-shm
-
-.venv/
-!frontend/dist/
-!frontend/dist/**
