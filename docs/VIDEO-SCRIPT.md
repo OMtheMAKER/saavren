@@ -35,7 +35,7 @@ actually matters, an elder using her own language.
 
 | On screen | Narration |
 |---|---|
-| The check-in opening by itself. Three questions, one at a time. Answer the first one by voice. | "And she never has to start the conversation. Saavren asks first — wake, noon, evening, bedtime — and it just listens." |
+| The check-in opening by itself. Three questions, one at a time. Answer the first one by voice. | "And she never has to start the conversation. Saavren asks first — morning, evening — and it just listens." *(SUPERSEDED: the shipped build runs two slots, morning 09:00 and evening 21:00. The recorded 164-second video says "four times a day"; `CHECKIN_KINDS` is `("morning", "evening")`. See Honest limits in README.)* |
 
 ## 0:42 – 1:02 · Medicines and triage
 

@@ -91,7 +91,7 @@ the app still runs every screen on a rule-based offline mirror. See
 - **Mini-triage** — "my head is hurting" produces 1–2 conversational follow-ups, then safe home care and red flags to watch. Severity ≥ 7 or any red flag offers to call the doctor. Always closes with the not-a-doctor disclaimer.
 
 ### 🌞 Companion
-- **Proactive check-ins** the app initiates itself at wake, noon, evening and bedtime — the elder just answers by voice. It never interrupts a conversation, an alarm, or an open emergency.
+- **Proactive check-ins** — the app starts these itself, twice a day by default: **morning (09:00) and evening (21:00)**. Each one opens with three spoken questions in her language and she answers by voice. The schedule is editable per elder, and the slot engine takes any list — the design spec called for four slots (wake, noon, evening, bedtime) and the shipped demo runs two. It never interrupts a conversation, an alarm, or an open emergency.
 - **Day journal** — every reply runs through a sentiment/state extractor into `{time, mood, health_note, topics}`.
 - **9 PM digest** — the day is composed into a summary and pushed to the family's alerts feed.
 
@@ -212,6 +212,11 @@ docs/images/            the screenshots above
 
 ## Honest limits
 
+- **Two check-in slots ship, not four.** `CHECKIN_KINDS` is
+  `("morning", "evening")` with slots at 09:00 and 21:00; the design spec
+  described four (wake, noon, evening, bedtime) and the one-minute tour video
+  says "four times a day". The contract is a list, so adding noon and bedtime
+  is data, not code — but the shipped demo runs two, and this file should say so.
 - Fall detection is **acoustic**, tuned for the thud of a fall. It is a safety
   net, not a medical device, and it does not replace a wearable.
 - The agent's medical guidance is explicitly not a doctor's advice; every

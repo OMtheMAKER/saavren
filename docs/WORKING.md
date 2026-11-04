@@ -45,7 +45,7 @@ Rule: card-free stack only · Meta open-weights models (MMS ASR + Llama on Baset
 
 ### 1b. 🌞 Companion layer — proactive check-ins + day journal → monitor digest (user point 2)
 - App stays **alive in background** (PWA + service-worker; demo runs while tab/PWA open — push keeps working when closed).
-- At soft intervals (wake, noon, evening, bedtime) the agent **calls out by itself in the default language** — TTS prompt: “Namaste Mohan ji, aaj ka din kaisa ja raha hai?” — no tap needed; user just answers by voice.
+- At soft intervals the agent **calls out by itself in the default language** — TTS prompt: “Namaste Mohan ji, aaj ka din kaisa ja raha hai?” — no tap needed; user just answers by voice. **Spec had four slots (wake, noon, evening, bedtime); the shipped build runs two — morning 09:00 and evening 21:00 (`CHECKIN_KINDS = ("morning", "evening")`). The slot list is data, so the other two are a config change, not a rewrite.**
 - Every reply is routed through Llama with a **sentiment/state extractor** → day-journal points: `{time, mood: calm|tired|low|happy|anxious, health_note, topics[]}`.
 - Through the day the agent keeps a **running log of how the elder is doing**; at 9:00 PM it composes a **daily summary** (mood trend, meals, meds adherence, walk, incidents) and pushes it to the monitor's 🔔 **Alerts feed** — the icon exists precisely for this.
 - All journal rows also land in the 🕓 Activity timeline (point 1's shared event stream).
