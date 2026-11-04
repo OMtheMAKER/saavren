@@ -1,67 +1,76 @@
 # Launch — the public vote
 
-The bonus pool (~$50k) is a **public vote / most-viral** award, announced around
-10 Nov. Judging runs 4–8 Nov; the ceremony is Mon 9 Nov.
+The bonus pool is **up to $50,000**, awarded by **public vote / most-viral**,
+announced on or about **10 November**. Judging runs 4–8 November; the ceremony
+is Monday 9 November.
 
-So: submit first, launch second. Everything below is for ~10 Nov onward, once
-there is something to vote *for*.
+So: submit first, launch second. Everything below is for ~10 November onward,
+once there is something to vote *for*.
 
 The one rule that governs all of it: **post the scene, not the feature list.**
 Everyone else will post a feature list.
 
+Links to use everywhere:
+
+| | |
+| --- | --- |
+| Live demo | <https://saavren.onrender.com> |
+| Demo video (1:42) | <https://youtu.be/QSggmFeMxTk> |
+| Code | <https://github.com/OMtheMAKER/saavren> |
+
 ---
 
-## LinkedIn — Hinglish, one scene, ≤200 words
+## LinkedIn — one scene, under 200 words
 
 Post this as text, not as an image. Put the video in the first comment and the
 live URL in the post body.
 
 ```
-09:40. शांति जी (72) ने आज सुबह की जाँच का जवाब नहीं दिया।
+09:40. Shanti ji is 72, and she did not answer the morning check-in.
 
-किसी ने कुछ टैप नहीं किया। फ़ोन ने खुद बोलना शुरू किया —
-"शांति जी, सुबह हो गई।"
+Nobody tapped anything. The phone started talking on its own:
+"Shanti ji, it is morning."
 
-हम बुज़ुर्गों के लिए ऐप बनाते हैं, और सब टाइप मांगते हैं। मेरी
-नानी ने एक health app खोली, तीन मेन्यू देखे, और बंद कर दिया।
-उन्हें मदद नहीं चाहिए थी — उन्हें बात चाहिए थी।
+We build apps for older people, and all of them ask for typing. My nani opened
+a health app, looked at three menus, and closed it. She did not need help. She
+needed someone to talk to.
 
-तो मैंने उल्टा बनाया। Saavren खुद शुरू करता है, हिंदी में पूछता है,
-और जवाब भी आवाज़ में देता है। पढ़ना नहीं पड़ता।
+So I built it backwards. Saavren starts the conversation itself, asks in Hindi,
+and answers out loud. Nothing to read.
 
-जाँच का जवाब नहीं आया, तो परिवार के monitor पर एक लाइन जाती है:
+When a check-in goes unanswered, one line lands on the family monitor:
 "No answer to the morning check-in. Worth a call."
 
-गिरने जैसी आवाज़ आई — 250 Hz से नीचे की थड, 60 ms में — तो पूछता है
-"क्या आप ठीक हैं?", 20 सेकंड का countdown। और वो खुद cancel कर
-सकती हैं।
+If a sub-250 Hz thud hits the mic inside 60 ms, it asks "are you OK?" with a
+20-second countdown — and she can cancel it herself. The cancel is the feature.
 
-Emergency dispatch simulated है: server से बाहर कुछ नहीं जाता। यह
-मैं छिपा नहीं रहा — ऐसा ऐप अगर 1% भी झूठ बोले, बेकार है।
+Emergency dispatch is simulated: nothing leaves the server. I am not hiding
+that. An app like this that lies even 1% of the time is worthless.
+
+It is not an AI doctor. It is someone who notices.
 
 Live: saavren.onrender.com
-90-second demo: [link]
 ```
 
 ---
 
-## X / Twitter — 5 tweets, thread
+## X / Twitter — 5 tweets, posted as one thread
 
 **1 — the scene. Nothing else.**
 
 ```
-09:40. शांति जी (72) ने आज सुबह की जाँच का जवाब नहीं दिया।
+09:40. Shanti ji is 72, and she did not answer the morning check-in.
 
-किसी ने कुछ टैप नहीं किया। फ़ोन ने खुद बोला:
-"शांति जी, सुबह हो गई।"
+Nobody tapped anything. The phone started talking on its own:
+"Shanti ji, it is morning."
 
-यह Saavren है 👇
+This is Saavren 👇
 ```
 
 **2 — the problem**
 
 ```
-Apps for old people assume typing.
+Apps for older people assume typing.
 
 My nani opened a health app, saw three menus, and closed it. She didn't need
 help. She needed someone to talk to.
@@ -86,7 +95,7 @@ She never typed a word. She never read a menu.
 Check-in goes unanswered → the family monitor gets one line:
 "No answer to the morning check-in. Worth a call."
 
-A sub-250 Hz thud hits the mic inside 60 ms → "क्या आप ठीक हैं?", 20s
+A sub-250 Hz thud hits the mic inside 60 ms → "are you OK?", a 20-second
 countdown, and SHE can cancel it.
 
 The cancel is the feature.
@@ -102,6 +111,7 @@ replace a wearable or a caregiver.
 It's not an AI doctor. It's someone who notices.
 
 Live: saavren.onrender.com
+Video: youtu.be/QSggmFeMxTk
 Code: github.com/OMtheMAKER/saavren
 ```
 
@@ -109,17 +119,17 @@ Code: github.com/OMtheMAKER/saavren
 
 ## WhatsApp / community — 3 lines
 
-For Indian dev groups *and* elder-care groups. Same message, both places.
+Same message in Indian dev groups and elder-care groups.
 
 ```
-Saavren — अकेले रहने वाले बुज़ुर्गों के लिए एक voice-first साथी।
-हिंदी में बोलता है, कुछ टाइप नहीं करना पड़ता।
+Saavren — a voice-first companion for elders living alone. Speaks Hindi,
+nothing to type.
 
-सुबह की जाँच का जवाब नहीं आया तो परिवार को सूचना; गिरने जैसी आवाज़ पर
-"क्या आप ठीक हैं?" — और वो खुद cancel कर सकती हैं।
+Missed the morning check-in? The family gets told. A fall-like sound triggers
+"are you OK?" — and she can cancel it herself.
 
-Live demo (free, no card): saavren.onrender.com · 90s video: [link] ·
-Code: github.com/OMtheMAKER/saavren
+Live demo (free, no card): saavren.onrender.com · 1:42 video:
+youtu.be/QSggmFeMxTk · Code: github.com/OMtheMAKER/saavren
 ```
 
 ---
@@ -129,31 +139,12 @@ Code: github.com/OMtheMAKER/saavren
 All times IST. Day = the day the public vote opens (~10 Nov).
 
 | When | What | Why |
-|---|---|---|
+| --- | --- | --- |
 | **09:00–10:30** | LinkedIn | Morning commute; best Indian professional reach. |
-| **+30 min** | X thread (all 5 at once) | Same-day as LinkedIn, so it reads as one push, not two stragglers. |
+| **+30 min** | X thread (all 5 at once) | Same day as LinkedIn, so it reads as one push, not two stragglers. |
 | **19:00–21:00** | WhatsApp + community groups | Family group chats are live in the evening; reply rate is highest. |
 
-**Do not** lead with WhatsApp. The vote page should already be warm and have
-some social proof on it before community traffic lands.
+**Do not** lead with WhatsApp. Let the vote page pick up some social proof
+first, then send community traffic.
 
 If the vote opens on a weekend, move LinkedIn to 10:00–11:00 and keep the rest.
-
----
-
-## What NOT to say
-
-Every one of these is either false or will get the project reported.
-
-- **No medical claims.** Not "detects falls" — *"listens for the sound of a fall."*
-- **Never "AI doctor".** Not in the copy, not in a hashtag, not in a reply.
-- **Never imply it replaces a wearable** (a fall pendant, an Apple Watch) **or a
-  caregiver.** It does not. Say so before someone else says it for you.
-- **Never say it calls an ambulance, a doctor, or anyone.** Dispatch is
-  simulated. Nothing leaves the server.
-- **Not "monitors your parents 24/7."** It listens in one room, while the mic is
-  on, when the app is open.
-- **No number you didn't measure.** Don't write "229 tests" or "9 languages"
-  unless it's true on the day you post.
-- **Don't promise features from `docs/WORKING.md`.** That file is a blueprint;
-  OTP login, invite codes and family pairing are not built.
