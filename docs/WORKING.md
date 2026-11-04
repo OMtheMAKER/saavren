@@ -1,4 +1,24 @@
 # Saavren — WORKING DEFINITIONS (feature blueprint)
+
+> ### ⚠️ SPEC — not all of this is built
+>
+> This is the **design blueprint**, written before and during the build. It
+> describes the intended product, not the shipped one. `README.md` is the
+> description of what actually runs.
+>
+> **Shipped:** accounts (signup/login, `scrypt` hashing, JWT sessions, session
+> revocation on password change) · acoustic fall detection with a cancellable
+> "are you OK?" countdown · the triage conversation (MMS ASR → Muse Spark Open
+> on Baseten → Groq fallback, spoken replies) · medicine schedule, check-ins,
+> adherence points, incident timeline · hospital packet (Nominatim +
+> haversine, static offline fallback).
+>
+> **NOT shipped** — described below, absent from the code: OTP login · invite
+> codes (`SVN-XXXX`) and family pairing · bcrypt (we use `hashlib.scrypt`) ·
+> friend-mode jokes and small talk.
+>
+> **Simulated:** emergency dispatch. No call is placed, no SMS sent, no webhook
+> fired.
 Status: FROZEN design v1.5 (`design/ui-rough-v15.html`) · Window: Oct 26 – Nov 4, 2026
 Rule: card-free stack only · Meta open-weights models (MMS ASR + Llama on Baseten/Groq + HF Inference)
 

@@ -143,7 +143,7 @@ command.
 Nine languages, switchable at any moment: **Hindi · English · Bengali · Tamil ·
 Telugu · Marathi · Gujarati · Spanish · French**.
 
-252 UI strings × 9 languages. Switching language moves the UI, the agent's
+265 UI strings × 9 languages. Switching language moves the UI, the agent's
 replies, the spoken output and the date/number formatting together — the
 `lang` is threaded to the backend with every request so the AI replies in the
 language on screen.
@@ -153,14 +153,20 @@ language on screen.
 ## Accounts, and privacy
 
 - **Local SQLite.** No cloud database, no hosted auth, no card.
-- **Login is optional.** The app is fully usable signed out; signing in is what
-  ties the data to a person and connects an elder to their family.
-- **Two roles** — elder and family — linked by an invite code (`SVN-XXXX`) or a
-  join link; both resolve to the same token.
+- **Login is optional.** The app is fully usable signed out; signing in ties an
+  account to a person. It does **not** yet pair an elder with their family —
+  there is no invite step, so both roles read the same store (below).
+- **Two roles at signup** — elder and family — which decide which view you land on.
 - Passwords hashed with stdlib `hashlib.scrypt`, not bcrypt/passlib — it needs
   no compiler on the user's Windows box and, unlike `audioop` and friends, is
   still present on Python 3.14. Per-user salts, constant-time compare.
-- Sessions are JWTs; changing a password revokes every other session for that user.
+- Sessions are JWTs; changing a password revokes every other session for that
+  user.
+- **Accounts are the only per-user data.** The profile, medicines, check-ins,
+  alerts and incidents live in one server-wide in-memory store — every session
+  sees the same demo data, and it resets when the server restarts. That is
+  single-tenant by design for a demo, not a privacy boundary. Splitting the
+  store per user is the next commit, not a missing feature.
 
 ---
 
@@ -169,14 +175,14 @@ language on screen.
 FastAPI · React + Vite · SQLite · Meta MMS ASR · Muse Spark Open on Baseten ·
 Groq fallback · browser `speechSynthesis` for voice output
 
-52 API endpoints. ~3,900 lines of backend Python.
+52 API endpoints. ~4,300 lines of backend Python.
 
 ---
 
 ## Testing
 
 ```bash
-cd backend && python -m pytest tests -q     # 209 passed
+cd backend && python -m pytest tests -q     # 229 passed
 cd frontend && npm run lint && npm run build
 ```
 
@@ -193,8 +199,8 @@ bundled it happily, and it only crashed on the family monitor.)
 ```
 run.py                  one-command launcher
 backend/app/            ai.py (model chains) · auth.py · main.py (52 endpoints)
-backend/tests/          209 tests
-frontend/src/           App.jsx · components/ · lib/i18n.js (252 keys × 9)
+backend/tests/          229 tests
+frontend/src/           App.jsx · components/ · lib/i18n.js (265 keys × 9)
 docs/WORKING.md         the full feature blueprint and build log
 docs/images/            the screenshots above
 ```
@@ -207,6 +213,10 @@ docs/images/            the screenshots above
   net, not a medical device, and it does not replace a wearable.
 - The agent's medical guidance is explicitly not a doctor's advice; every
   health answer says so.
+- **Emergency dispatch is simulated.** An SOS or an unanswered fall raises an
+  alert, writes it to the family feed and builds the hospital packet with the
+  nearest three hospitals. It does not place a call, send an SMS or fire a
+  webhook, and the app does not claim on screen that it did.
 - Muse Spark Open does not support structured JSON output on Baseten, so the
   model layer parses leniently and validates rather than assuming a schema.
 - Voice output uses the browser's `speechSynthesis`, so the voice quality
@@ -214,7 +224,32 @@ docs/images/            the screenshots above
 
 ---
 
-## Built during the hackathon window
+## What is real, and what is simulated
 
-Everything here was written between Oct 26 and Nov 4, 2026. The commit
-history is the build log — one day at a time.
+Built and runs today:
+
+- Accounts — signup, login, scrypt password hashing, JWT sessions, session
+  revocation on password change, stored in SQLite.
+- Acoustic fall detection on the live microphone stream, with an "are you OK?"
+  countdown the elder can cancel.
+- The triage conversation — browser speech-to-text, Meta MMS ASR, Muse Spark
+  Open on Baseten with a Groq fallback, and spoken replies.
+- Medicine schedule, check-ins, adherence points and the incident timeline,
+  held in one in-memory store.
+- The hospital packet — nearest three hospitals from OpenStreetMap Nominatim,
+  haversine-sorted, with a static offline list if the network is down.
+
+Simulated on purpose:
+
+- Emergency dispatch. Nothing leaves the server. See Honest limits.
+- The shared demo store above.
+
+Not built, though `docs/WORKING.md` describes it: OTP login, invite codes,
+bcrypt, and the friend-mode small talk. That file is a blueprint, not a
+changelog — it is marked as one.
+
+---
+
+## License
+
+MIT — see [LICENSE](LICENSE). Copyright © 2026 Om Pratap Singh.

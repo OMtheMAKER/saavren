@@ -97,14 +97,11 @@ FROM_SERVER = {
 }
 
 PLANNED = {
-    'history': 'sidebar section heading',
     'highlights': 'monitor daily-summary heading',
-    'persona': 'settings > speaking style section',
     'profile': 'health profile card heading',
     'readings_logged': 'toast after logging vitals',
     'saved': 'profile saved confirmation',
     'checkin_retry': 'check-in retry after a failed recording',
-    'tap_stop': 'check-in press-and-hold hint',
 }
 
 

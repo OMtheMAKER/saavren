@@ -791,13 +791,13 @@ def _escalate(alarm_id: str) -> None:
         _notify("SOS pressed",
                 f"{p['name']} ne SOS button dabaya hai. Turant call karein. "
                 f"Contact: {p['emergency_contact']}", "emergency")
-        _log("SOS pressed — family + doctor notified, call placed", "sos")
+        _log("SOS pressed — alert raised, family feed updated", "sos")
     else:
         _notify("FALL — no answer",
                 f"{p['name']} ne {a['grace']}s tak jawab nahi diya. "
                 f"Turant check karein. Contact: {p['emergency_contact']}",
                 "emergency")
-        _log("FALL escalated — family + doctor notified, call placed", "fall")
+        _log("FALL escalated — alert raised, family feed updated", "fall")
 
 
 @app.post("/api/fall")

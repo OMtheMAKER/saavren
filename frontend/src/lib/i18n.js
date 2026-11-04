@@ -8,6 +8,8 @@ export const LANGS = [
 
 const D = {
   new_chat:      {hi:'नई बातचीत', en:'New chat', bn:'নতুন কথোপকথন', ta:'புதிய அரட்டை', te:'కొత్త చాట్', mr:'नवीन संभाषण', gu:'નવી વાતચીત', es:'Nuevo chat', fr:'Nouvelle discussion'},
+  new_chat_title: {hi:'नई बातचीत', en:'New chat', bn:'নতুন কথোপকথন', ta:'புதிய அரட்டை', te:'కొత్త చాట్', mr:'नवीन संभाषण', gu:'નવી વાતચીત', es:'Nuevo chat', fr:'Nouvelle discussion'},
+  rename:        {hi:'नाम बदलें', en:'Rename', bn:'নাম বদল', ta:'பெயர் மாற்று', te:'పేరు మార్చు', mr:'नाव बदला', gu:'નામ બદલો', es:'Renombrar', fr:'Renommer'},
   history:       {hi:'इतिहास', en:'History', bn:'ইতিহাস', ta:'வரலாறு', te:'చరిత్ర', mr:'इतिहास', gu:'ઇતિહાસ', es:'Historial', fr:'Historique'},
   medicines:     {hi:'दवाइयाँ', en:'Medicines', bn:'ঔষধ', ta:'மருந்துகள்', te:'మందులు', mr:'औषधे', gu:'દવાઓ', es:'Medicinas', fr:'Médicaments'},
   health:        {hi:'सेहत', en:'Health', bn:'স্বাস্থ্য', ta:'உடல்நலம்', te:'ఆరోగ్యం', mr:'आरोग्य', gu:'આરોગ્ય', es:'Salud', fr:'Santé'},
@@ -15,6 +17,10 @@ const D = {
   notifications: {hi:'सूचनाएँ', en:'Notifications', bn:'বিজ্ঞপ্তি', ta:'அறிவிப்புகள்', te:'నోటిఫికేషన్లు', mr:'सूचना', gu:'સૂચનાઓ', es:'Avisos', fr:'Notifications'},
   settings:      {hi:'सेटिंग्स', en:'Settings', bn:'সেটিংস', ta:'அமைப்புகள்', te:'సెట్టింగ్‌లు', mr:'सेटिंग्ज', gu:'સેટિંગ્સ', es:'Ajustes', fr:'Paramètres'},
   theme:         {hi:'थीम', en:'Theme', bn:'থিম', ta:'தீம்', te:'థీమ్', mr:'थीम', gu:'થીમ', es:'Tema', fr:'Thème'},
+  theme_light:   {hi:'लाइट', en:'Light', bn:'লাইট', ta:'லைட்', te:'లైట్', mr:'लाइट', gu:'લાઇટ', es:'Claro', fr:'Clair'},
+  theme_dark:    {hi:'डार्क', en:'Dark', bn:'ডার্ক', ta:'டார்க்', te:'డార్క్', mr:'डार्क', gu:'ડાર્ક', es:'Oscuro', fr:'Sombre'},
+  model:         {hi:'मॉडल', en:'Model', bn:'মডেল', ta:'மாடல்', te:'మోడల్', mr:'मॉडेल', gu:'મોડેલ', es:'Modelo', fr:'Modèle'},
+  source:        {hi:'स्रोत', en:'Source', bn:'উৎস', ta:'மூலம்', te:'మూలం', mr:'स्रोत', gu:'સ્ત્રોત', es:'Origen', fr:'Source'},
   language:      {hi:'भाषा', en:'Language', bn:'ভাষা', ta:'மொழி', te:'భాష', mr:'भाषा', gu:'ભાષા', es:'Idioma', fr:'Langue'},
   voice_out:     {hi:'आवाज़ में जवाब', en:'Voice replies', bn:'ভয়েস উত্তর', ta:'குரல் பதில்கள்', te:'వాయిస్ సమాధానాలు', mr:'आवाज उत्तरे', gu:'અવાજ જવાબો', es:'Respuestas por voz', fr:'Réponses vocales'},
   persona:       {hi:'बोलने का अंदाज़', en:'Speaking style', bn:'কথার ধরন', ta:'பேசும் பாணி', te:'మాట్లాడే శైలి', mr:'बोलण्याची शैली', gu:'બોલવાની શૈલી', es:'Estilo de habla', fr:'Style de parole'},
@@ -24,6 +30,8 @@ const D = {
   cancel:        {hi:'रद्द', en:'Cancel', bn:'বাতিল', ta:'ரத்து', te:'రద్దు', mr:'रद्द', gu:'રદ', es:'Cancelar', fr:'Annuler'},
   delete:        {hi:'हटाएँ', en:'Delete', bn:'মুছুন', ta:'நீக்கு', te:'తొలగించు', mr:'काढा', gu:'કાઢી નાખો', es:'Eliminar', fr:'Supprimer'},
   send:          {hi:'भेजें', en:'Send', bn:'পাঠান', ta:'அனுப்பு', te:'పంపు', mr:'पाठवा', gu:'મોકલો', es:'Enviar', fr:'Envoyer'},
+  placeholder:   {hi:'कुछ लिखें…', en:'Type a message…', bn:'কিছু লিখুন…', ta:'ஏதாவது எழுது…', te:'ఏదైనా రాయండి…', mr:'काही लिहा…', gu:'કંઈ લખો…', es:'Escribe un mensaje…', fr:'Écrivez un message…'},
+  footnote:      {hi:'AI सहायक — डॉक्टर नहीं।', en:'AI assistant — not a doctor.', bn:'AI সহকারী — ডাক্তার নন।', ta:'AI உதவியாளர் — மருத்துவர் அல்ல.', te:'AI సహాయకుడు — వైద్యుడు కాదు.', mr:'AI सहाय्यक — डॉक्टर नाही.', gu:'AI સહાયક — ડૉક્ટર નથી.', es:'Asistente de IA — no es un médico.', fr:'Assistant IA — pas un médecin.'},
   ask:           {hi:'कुछ भी पूछें…', en:'Ask anything…', bn:'যেকোনো কিছু জিজ্ঞাসা…', ta:'எதையும் கேளுங்கள்…', te:'ఏదైనా అడగండి…', mr:'काहीही विचारा…', gu:'કંઈ પણ પૂછો…', es:'Pregunta lo que quieras…', fr:'Demandez ce que vous voulez…'},
   listening:     {hi:'सुन रहा हूँ…', en:'Listening…', bn:'শুনছি…', ta:'கேட்கிறேன்…', te:'వింటున్నాను…', mr:'ऐकत आहे…', gu:'સાંભળું છું…', es:'Escuchando…', fr:'Écoute…'},
   tap_stop:      {hi:'रोकने के लिए दबाएँ', en:'tap to stop', bn:'থামাতে টিপুন', ta:'நிறுத்த தட்டவும்', te:'ఆపడానికి నొక్కండి', mr:'थांबविण्यासाठी दाबा', gu:'રોકવા માટે દબાવો', es:'pulsa para parar', fr:'appuyez pour arrêter'},
