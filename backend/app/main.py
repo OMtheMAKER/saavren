@@ -288,12 +288,42 @@ def _log(text: str, source: str = "agent") -> dict:
     return item
 
 
-def _notify(title: str, body: str, kind: str = "info") -> dict:
+def _notify(title: str, body: str, kind: str = "info",
+            t_key: str = "", t_params: dict | None = None) -> dict:
+    """`t_key`/`t_params` keep the alert as a translatable key, not prose, so
+    the monitor can render it in the reader's language. Rows without a t_key
+    are stored and returned exactly as they always were."""
     n = {"id": uuid.uuid4().hex[:8], "ts": time.time(), "title": title,
          "body": body, "kind": kind, "read": False}
+    if t_key:
+        n["t_key"] = t_key
+        n["t_params"] = t_params or {}
     STATE["notifications"].insert(0, n)
     STATE["notifications"] = STATE["notifications"][:100]
     return n
+
+
+def _render_notifications(lang: str) -> list:
+    """Notifications with finished text in `lang`.
+
+    Rows carrying a t_key are re-rendered; everything else passes through
+    untouched. A miss falls back to the English prose already stored on the
+    row — never to a bare key, which is how 'theme_light' reached the screen.
+    """
+    out = []
+    for n in STATE["notifications"]:
+        key = n.get("t_key")
+        if key != "checkin_missed":
+            out.append(n)
+            continue
+        p = n.get("t_params") or {}
+        txt = ai_extra.missed_checkin_text(lang, p.get("name", ""),
+                                          p.get("slot_kind", ""),
+                                          p.get("dur_min", 0))
+        out.append({**n,
+                    "title": txt["title"] or n["title"],
+                    "body": txt["body"] or n["body"]})
+    return out
 
 
 def public_state(lang: str | None = None) -> dict:
@@ -318,7 +348,7 @@ def public_state(lang: str | None = None) -> dict:
                 for m in meds]
     return {"profile": profile, "meds": meds,
             "activity": STATE["activity"][:60],
-            "notifications": STATE["notifications"],
+            "notifications": _render_notifications(lang),
             "alarm": STATE["alarm"], "location": STATE["location"],
             "emergencies": STATE["emergencies"][:10],
             "monitor": STATE["monitor"],
@@ -900,7 +930,7 @@ def log_call(eid: str, payload: dict | None = None):
 # --------------------------------------------------------------------------
 # D5 — the family monitor: one payload with the whole picture
 # --------------------------------------------------------------------------
-def monitor_payload() -> dict:
+def monitor_payload(lang: str | None = None) -> dict:
     """Everything the family dashboard shows, in one round trip.
 
     It mirrors the elder's app A-to-Z (profile, medicines, activity,
@@ -911,7 +941,8 @@ def monitor_payload() -> dict:
         "profile": STATE["profile"],
         "meds": STATE["meds"],
         "activity": STATE["activity"][:80],
-        "notifications": STATE["notifications"],
+        "notifications": _render_notifications(
+            (lang or _lang_ctx.get() or "en").lower()),
         "alarm": STATE["alarm"],
         "emergencies": STATE["emergencies"][:20],
         "location": STATE["location"],
@@ -919,7 +950,10 @@ def monitor_payload() -> dict:
         "checkins": STATE["checkins"][:20],
         "card": ai_extra.emergency_card(STATE["profile"], STATE["meds"]),
         "sehat": ai_extra.sehat_board(STATE),
-        "summary": ai_extra.daily_summary(STATE),
+        "summary": ai_extra.daily_summary(
+            STATE, lang=(lang or _lang_ctx.get() or "en").lower()),
+        "digest": ai_extra.daily_digest(
+            STATE, lang=(lang or _lang_ctx.get() or "en").lower()),
         "unread": sum(1 for n in STATE["notifications"] if not n.get("read")),
         "generated_at": time.time(),
     }
@@ -1283,10 +1317,15 @@ def _scheduler_tick(now: float | None = None) -> list[str]:
                "summary": f"no answer to the {due['kind']} check-in"}
         STATE["checkins"].insert(0, rec)
         STATE["checkins"] = STATE["checkins"][:120]
-        _notify(f"No answer — {due['kind']} check-in",
-                f"{name} did not answer the {due['kind']} check-in "
-                f"({due['overdue_min']} min). Worth a call.", "emergency")
-        _log(f"Missed {due['kind']} check-in ({due['overdue_min']} min)",
+        _alang = (_lang_ctx.get() or "en").lower()
+        _en = ai_extra.missed_checkin_text("en", name, due["kind"],
+                                          due["overdue_min"])
+        _notify(_en["title"], _en["body"], "emergency",
+                t_key="checkin_missed",
+                t_params={"name": name, "slot_kind": due["kind"],
+                          "dur_min": due["overdue_min"]})
+        _log(ai_extra.missed_checkin_text(_alang, name, due["kind"],
+                                         due["overdue_min"])["log"],
              "checkin")
         did.append(f"missed:{due['kind']}")
 
