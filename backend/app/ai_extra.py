@@ -22,6 +22,9 @@ def vision_extract(data: bytes, content_type: str = "", lang: str = "en") -> dic
             return _vision_baseten(data, content_type, lang)
         except Exception as e:
             print(f"[saavren] scan fail -> {type(e).__name__}: {e}", flush=True)
+            out = _vision_offline(data, lang)
+            out["error"] = f"{type(e).__name__}: {e}"[:300]
+            return out
     return _vision_offline(data, lang)
 
 
@@ -41,7 +44,7 @@ def _vision_baseten(data: bytes, content_type: str, lang: str) -> dict:
     mime = content_type or "image/jpeg"
     body = {
         "model": ai.BASETEN_MODEL,
-        "max_tokens": 600,
+        "max_tokens": 2000,
         "temperature": 1.0 if "muse" in ai.BASETEN_MODEL.lower() else 0.3,
         "messages": [
             {"role": "system",
@@ -59,7 +62,12 @@ def _vision_baseten(data: bytes, content_type: str, lang: str) -> dict:
                    headers={"Authorization": f"Bearer {ai._env('BASETEN_API_KEY')}"},
                    json=body)
     r.raise_for_status()
-    txt = r.json()["choices"][0]["message"]["content"]
+    msg = r.json()["choices"][0]["message"]
+    txt = (msg.get("content") or "").strip()
+    if not txt:
+        raise RuntimeError("scan: empty content | keys=" +
+                           ",".join(sorted(msg.keys())) +
+                           " | finish=" + str(r.json()["choices"][0].get("finish_reason")))
     obj = ai.parse_json_loose(txt) or {}
     meds = []
     for m in (obj.get("meds") or []):
@@ -71,7 +79,8 @@ def _vision_baseten(data: bytes, content_type: str, lang: str) -> dict:
            "precautions": [str(p)[:200] for p in (obj.get("precautions") or [])][:5],
            "source": "baseten"}
     if not meds:
-        raise RuntimeError("scan: koi dawai nahi mili")
+        raise RuntimeError("scan: koi dawai nahi mili | reply="
+                           + repr(txt[:220]))
     return out
 
 

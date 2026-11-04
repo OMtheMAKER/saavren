@@ -1049,10 +1049,13 @@ async def scan(file: UploadFile = File(...), lang: str = "en"):
             added.append(med)
     if added:
         _log(f"Scan se {len(added)} dawa judi", "scan")
-    return {"summary": parsed.get("summary", ""),
-            "precautions": parsed.get("precautions") or [],
-            "source": parsed.get("source", "offline-fallback"),
-            "added": added, "state": public_state()}
+    out = {"summary": parsed.get("summary", ""),
+           "precautions": parsed.get("precautions") or [],
+           "source": parsed.get("source", "offline-fallback"),
+           "added": added, "state": public_state()}
+    if parsed.get("error"):
+        out["error"] = parsed["error"]
+    return out
 
 
 # --------------------------------------------------------------------------
