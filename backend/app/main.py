@@ -16,7 +16,7 @@ from pydantic import BaseModel
 
 from . import ai, ai_extra, auth
 
-app = FastAPI(title="Saavren", version="0.8.5-sw",
+app = FastAPI(title="Saavren", version="0.8.6-fit",
               description="Voice-first emergency guardian & daily health companion.")
 
 def _web_dir() -> Path:

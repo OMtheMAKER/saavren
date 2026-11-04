@@ -114,7 +114,7 @@ a { color:inherit; }
 /* ---------- chat ---------- */
 .chatwrap { flex:1; display:flex; flex-direction:column; min-height:0; }
 .msgs { flex:1; overflow:auto; padding:20px 0 8px; }
-.wrap { max-width:820px; margin:0 auto; padding:0 16px; }
+.wrap { max-width:1080px; margin:0 auto; padding:0 16px; }
 .msg { margin:0 0 14px; line-height:1.55; white-space:pre-wrap; word-break:break-word; }
 .msg.me {
   background:var(--card); border:1px solid var(--line); border-radius:14px;
@@ -438,3 +438,35 @@ a { color:inherit; }
   margin:10px 16px 0; border-radius:10px;
   background:rgba(96,165,250,.10); border:1px solid rgba(96,165,250,.28);
   color:var(--text); font-size:13px; }
+
+/* ---------- phone fit ----------------------------------------------------
+   On a phone the app kept desktop-sized type inside a centred column, so it
+   read as a small box in the middle of the screen. Below, the content runs
+   edge to edge and every control gets a size a thumb and an eye can use.
+   ------------------------------------------------------------------------ */
+@media (max-width:720px) {
+  body { font-size:18px; }
+  .view { padding:10px; }
+  .wrap { max-width:100%; padding:0; }
+  .topbar { height:62px; padding:0 12px; }
+  .brand b { font-size:19px; }
+  .btn { font-size:16px; padding:14px 18px; }
+  .btn.small { font-size:14.5px; padding:10px 14px; }
+  .tile { padding:20px 16px; min-height:130px; }
+  .tile .ic { font-size:34px; }
+  .tile b { font-size:18px; margin-top:10px; }
+  .tile span { font-size:14px; margin-top:6px; }
+  .hero .big { font-size:28px; }
+  .msg { font-size:17.5px; line-height:1.6; }
+  .msg.me { max-width:88%; padding:13px 16px; }
+  .msg.you { max-width:96%; }
+  .composer textarea, .bar input { font-size:17px; }
+  .scard h4 { font-size:17px; }
+  .chip { font-size:13px; padding:6px 11px; }
+}
+
+/* Wide screens: the column is wider now, so keep chat lines readable. */
+@media (min-width:721px) {
+  .msg.me { max-width:640px; }
+  .msg.you { max-width:820px; }
+}

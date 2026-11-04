@@ -22,28 +22,6 @@ because the person who needs it most will not type.
 
 ---
 
-## Screenshots
-
-Real captures of the live deployment — <https://saavren.onrender.com>. These
-are the Hindi UI; the same screens run in nine languages, and the language
-switch moves the labels, the AI's replies and the spoken voice together.
-
-| Home & check-ins | Medicines |
-| --- | --- |
-| ![Home screen](docs/images/01-home.png) | ![Medicines](docs/images/02-medicines.png) |
-
-| Companion chat | Family monitor |
-| --- | --- |
-| ![Chat](docs/images/03-chat.png) | ![Family monitor](docs/images/04-family-monitor.png) |
-
-| Phone — home | Phone — drawer |
-| --- | --- |
-| ![Phone home](docs/images/05-phone-home.png) | ![Phone drawer](docs/images/06-phone-drawer.png) |
-
-A full walkthrough with narration is in the demo video on the submission page.
-
----
-
 ## Run it
 
 One command. No Docker, no Node toolchain, no system packages.
@@ -185,7 +163,6 @@ backend/app/            ai.py (model chains) · auth.py · main.py (52 endpoints
 backend/tests/          209 tests
 frontend/src/           App.jsx · components/ · lib/i18n.js (252 keys × 9)
 docs/WORKING.md         the full feature blueprint and build log
-docs/images/            the screenshots above
 ```
 
 ---
