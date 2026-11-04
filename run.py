@@ -30,9 +30,9 @@ ENV = os.path.join(ROOT, ".env")
 ENV_EXAMPLE = os.path.join(ROOT, ".env.example")
 
 KEYS = [
-    ("HF_TOKEN", "ASR  (Meta MMS awaz)"),
-    ("BASETEN_API_KEY", "LLM  (Llama 4)"),
-    ("GROQ_API_KEY", "LLM fallback (Groq)"),
+    ("HF_TOKEN", "ASR  (Meta MMS voice, optional)"),
+    ("BASETEN_API_KEY", "LLM  (Muse Spark Open)"),
+    ("GROQ_API_KEY", "LLM fallback + live ASR (Groq whisper)"),
 ]
 
 

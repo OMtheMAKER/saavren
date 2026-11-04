@@ -105,7 +105,7 @@ Operates every feature on the elder's behalf — or the elder can do it by hand;
 
 ## The AI, and why it never hard-fails
 
-Two Meta open-weight models, front and centre:
+Two Meta open-weight models. Which one actually runs on the live demo:
 
 | Job | Model |
 |---|---|
@@ -174,8 +174,9 @@ language on screen.
 
 ## Stack
 
-FastAPI · React + Vite · SQLite · Meta MMS ASR · Muse Spark Open on Baseten ·
-Groq fallback · browser `speechSynthesis` for voice output
+FastAPI · React + Vite · SQLite · Groq whisper ASR · Muse Spark Open on Baseten ·
+Groq model fallback · browser `speechSynthesis` for voice output · Meta MMS ASR
+(wired, inactive without an HF token)
 
 52 API endpoints. ~4,300 lines of backend Python.
 

@@ -1,4 +1,9 @@
-# Demo video script — 3 minutes
+# Demo video script — 3 minutes  (SUPERSEDED)
+
+> **Use `docs/VIDEO-90S.md` instead.** This script produced the 164-second
+> video now on YouTube and is kept for reference only. It contains one line
+> that is no longer true — "Meta MMS for speech". MMS has never run on the
+> live deployment; see "Honest limits" in the README.
 
 Two rules I've built this around, because you asked for both: **no laptop
 intro** (we open on the product, not on a person), and **the narration always

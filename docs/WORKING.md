@@ -15,7 +15,9 @@
 >
 > **NOT shipped** — described below, absent from the code: OTP login · invite
 > codes (`SVN-XXXX`) and family pairing · bcrypt (we use `hashlib.scrypt`) ·
-> friend-mode jokes and small talk.
+> friend-mode jokes and small talk · **Llama 4 Maverick and Llama-3.1-8B as the
+> reasoning model** — every "Llama" below means the shipped model, Muse Spark
+> Open `meta-models/muse-spark-open` on Baseten.
 >
 > **Simulated:** emergency dispatch. No call is placed, no SMS sent, no webhook
 > fired.
