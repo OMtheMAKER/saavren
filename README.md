@@ -1,4 +1,4 @@
----
+﻿---
 title: Saavren
 emoji: 🧓
 colorFrom: indigo
@@ -185,7 +185,7 @@ Groq model fallback · browser `speechSynthesis` for voice output · Meta MMS AS
 ## Testing
 
 ```bash
-cd backend && python -m pytest tests -q     # 229 passed
+cd backend && python -m pytest tests -q     # 243 passed
 cd frontend && npm run lint && npm run build
 ```
 
@@ -202,7 +202,7 @@ bundled it happily, and it only crashed on the family monitor.)
 ```
 run.py                  one-command launcher
 backend/app/            ai.py (model chains) · auth.py · main.py (52 endpoints)
-backend/tests/          229 tests
+backend/tests/          243 tests
 frontend/src/           App.jsx · components/ · lib/i18n.js (265 keys × 9)
 docs/WORKING.md         the full feature blueprint and build log
 docs/images/            the screenshots above
