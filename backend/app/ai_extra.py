@@ -367,6 +367,121 @@ FALL_STRINGS = {
 # --------------------------------------------------------------------------
 # D5 — the family monitor: one honest picture of the elder's day
 # --------------------------------------------------------------------------
+# --------------------------------------------------------------------------
+# Human durations, and alert copy in the reader's language.
+#
+# A raw "587 min" reads as machine output. "9 h 47 min" reads as a fact about
+# a person. Same rounding rule as ago(): round DOWN, never invent precision,
+# and never raise — this sits in a background tick.
+# --------------------------------------------------------------------------
+_HUMAN_UNITS = {
+    "en": {"min": "min", "h": "h", "h1": "h", "d": "days", "d1": "day"},
+    "hi": {"min": "\u092e\u093f\u0928\u091f", "h": "\u0918\u0902\u091f\u0947",
+           "h1": "\u0918\u0902\u091f\u093e", "d": "\u0926\u093f\u0928",
+           "d1": "\u0926\u093f\u0928"},
+}
+
+
+def humanize_minutes(m, lang: str = "en") -> str:
+    """'47 min' / '9 h 47 min' / '1 day 2 h'. Never raises.
+
+    en: 47 -> "47 min"      587 -> "9 h 47 min"      1440 -> "1 day"
+    hi: 47 -> "47 \u092e\u093f\u0928\u091f"   587 -> "9 \u0918\u0902\u091f\u0947 47 \u092e\u093f\u0928\u091f"
+    """
+    try:
+        m = int(m)
+    except (TypeError, ValueError):
+        m = 0
+    if m < 0:
+        m = 0
+    u = _HUMAN_UNITS.get(lang, _HUMAN_UNITS["en"])
+    if m < 60:
+        return f"{m} {u['min']}"
+    if m < 1440:
+        h, mm = m // 60, m % 60
+        hs = u["h1"] if h == 1 else u["h"]
+        return f"{h} {hs}" if mm == 0 else f"{h} {hs} {mm} {u['min']}"
+    d, h = m // 1440, (m % 1440) // 60
+    ds = u["d1"] if d == 1 else u["d"]
+    if h == 0:
+        return f"{d} {ds}"
+    hs = u["h1"] if h == 1 else u["h"]
+    return f"{d} {ds} {h} {hs}"
+
+
+# --------------------------------------------------------------------------
+# Alert copy. Stored as a key + params and translated on the way out, exactly
+# like SEED_TEXT, so the family monitor follows the language switch instead of
+# leaving English prose sitting inside a Hindi interface.
+#
+# Sentences are provided in hi and en — the two the demo ships in, and the two
+# that can be written honestly here. Other languages fall back to en, never to
+# a bare key. The slot words ARE given in all nine: they are single everyday
+# words, verifiable, and they are the difference between a translated alert and
+# an untranslated one even when the sentence around them stays English.
+# --------------------------------------------------------------------------
+ALERT_TEXT = {
+    "checkin_missed_title": {
+        "hi": "\u091c\u0935\u093e\u092c \u0928\u0939\u0940\u0902 \u2014 {slot}",
+        "en": "No answer \u2014 {slot} check-in"},
+    "checkin_missed_body": {
+        "hi": ("{name} \u091c\u0940 \u0928\u0947 {slot} \u0915\u093e \u091c\u0935\u093e\u092c "
+               "\u0928\u0939\u0940\u0902 \u0926\u093f\u092f\u093e ({dur})\u0964 "
+               "\u090f\u0915 \u092c\u093e\u0930 \u092b\u093c\u094b\u0928 \u0915\u0930 \u0932\u0947\u0902\u0964"),
+        "en": ("{name} did not answer the {slot} check-in ({dur}). "
+               "Worth a call.")},
+    "checkin_missed_log": {
+        "hi": "{slot} \u0915\u093e \u091c\u0935\u093e\u092c \u0928\u0939\u0940\u0902 \u2014 {dur}",
+        "en": "Missed {slot} check-in ({dur})"},
+    "slot_morning": {
+        "hi": "\u0938\u0941\u092c\u0939 \u0915\u0940 \u091c\u093e\u0901\u091a",
+        "en": "morning", "bn": "\u09b8\u0995\u09be\u09b2",
+        "ta": "\u0b95\u0bb2\u0bc8", "te": "\u0c09\u0c26\u0c2f\u0c02",
+        "mr": "\u0938\u0915\u093e\u0933", "gu": "\u0ab8\u0ab5\u0abe\u0ab0",
+        "es": "ma\u00f1ana", "fr": "matin"},
+    "slot_evening": {
+        "hi": "\u0936\u093e\u092e \u0915\u0940 \u091c\u093e\u0901\u091a",
+        "en": "evening", "bn": "\u09b8\u09a8\u09cd\u09a7\u09cd\u09af\u09be",
+        "ta": "\u0bae\u0bbe\u0bb2\u0bc8", "te": "\u0c38\u0c3e\u0c2f\u0c02\u0c24\u0c4d\u0c30\u0c02",
+        "mr": "\u0938\u0902\u0927\u094d\u092f\u093e\u0915\u093e\u0933",
+        "gu": "\u0ab8\u0abe\u0a82\u0a9c", "es": "tarde", "fr": "soir"},
+}
+
+
+def alert_str(key: str, lang: str, **params) -> str:
+    """Alert text in `lang`, falling back to English, never to a bare key."""
+    row = ALERT_TEXT.get(key) or {}
+    tmpl = (row.get(lang) or row.get("en") or "")
+    if not tmpl:
+        return ""
+    try:
+        return tmpl.format(**params)
+    except (KeyError, IndexError, ValueError):
+        # A missing placeholder must render as English prose, never as a
+        # half-formatted template and never as the key name.
+        en = row.get("en") or ""
+        try:
+            return en.format(**params)
+        except (KeyError, IndexError, ValueError):
+            return ""
+
+
+def missed_checkin_text(lang: str, name: str = "", slot_kind: str = "",
+                        dur_min=None) -> dict:
+    """The three strings a missed check-in produces, in `lang`."""
+    if lang not in ALERT_TEXT["slot_morning"]:
+        lang = "en"
+    kind = str(slot_kind or "").lower()
+    slot = alert_str("slot_" + kind, lang) or kind
+    dur = humanize_minutes(dur_min, lang)
+    return {
+        "title": alert_str("checkin_missed_title", lang, slot=slot),
+        "body": alert_str("checkin_missed_body", lang, name=name, slot=slot,
+                          dur=dur),
+        "log": alert_str("checkin_missed_log", lang, slot=slot, dur=dur),
+    }
+
+
 def ago(ts: float | None, now: float | None = None) -> str:
     """'just now' / '12 min ago' / '3 h ago' / '2 d ago'. Never raises."""
     if not ts:
@@ -398,7 +513,8 @@ def _day_start(now: float) -> float:
 CHECKIN_SOURCES = ("checkin", "check-in", "voice", "triage", "agent", "note")
 
 
-def daily_summary(state: dict, now: float | None = None) -> dict:
+def daily_summary(state: dict, now: float | None = None,
+                  lang: str = "en") -> dict:
     """Turn raw app state into the answer to 'how is she today?'.
 
     Pure function — no network, no clock surprises (pass `now` in tests).
@@ -454,10 +570,14 @@ def daily_summary(state: dict, now: float | None = None) -> dict:
     for m in overdue:
         concerns.append(f"{m.get('name')} was due at {m.get('time')} and is still pending")
     for c in missed:
-        concerns.append(f"did not answer the {c.get('kind')} check-in")
+        _sl = (alert_str("slot_" + str(c.get('kind') or '').lower(), lang)
+               or c.get('kind'))
+        concerns.append(f"did not answer the {_sl} check-in")
     for c in answered:
         if c.get("mood") == "bad":
-            concerns.append(f"reported feeling unwell at the {c.get('kind')} check-in")
+            _sl2 = (alert_str("slot_" + str(c.get('kind') or '').lower(), lang)
+                    or c.get('kind'))
+            concerns.append(f"reported feeling unwell at the {_sl2} check-in")
         symptoms = [f for f in (c.get("flags") or []) if f in SYMPTOM_FLAGS]
         if symptoms:
             concerns.append(f"{c.get('kind')} check-in flagged: "
@@ -894,7 +1014,8 @@ def due_checkin(state: dict, now: float | None = None) -> dict | None:
     return None
 
 
-def daily_digest(state: dict, now: float | None = None) -> dict:
+def daily_digest(state: dict, now: float | None = None,
+                 lang: str = "en") -> dict:
     """D6 — the end-of-day note the family wakes up to.
 
     Everything the monitor already shows, plus the check-in story: what she
@@ -902,7 +1023,7 @@ def daily_digest(state: dict, now: float | None = None) -> dict:
     go straight to the monitor, an SMS or a WhatsApp message.
     """
     now = now if now is not None else time.time()
-    s = daily_summary(state, now)
+    s = daily_summary(state, now, lang=lang)
     start = _day_start(now)
     p = state.get("profile") or {}
     name = (p.get("name") or "She").split(" ")[0]
