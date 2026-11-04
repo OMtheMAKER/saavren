@@ -22,6 +22,39 @@ because the person who needs it most will not type.
 
 ---
 
+## Try it
+
+| | |
+| --- | --- |
+| **Live demo** | <https://saavren.onrender.com> — opens in any browser, nothing to install |
+| **Android APK** | [Download the APK](https://github.com/OMtheMAKER/saavren/releases/latest) — Android 7.0+, allow "Unknown sources" |
+| **Demo video** | [Watch the 2-minute walkthrough](https://youtu.be/5X5oRt5ci6g) |
+
+The live demo and the APK run the same build. Render's free tier sleeps when
+idle, so give the first load about 30 seconds to wake up.
+
+---
+
+## Screenshots
+
+Real captures of the live deployment — <https://saavren.onrender.com>. These
+are the Hindi UI; the same screens run in nine languages, and the language
+switch moves the labels, the AI's replies and the spoken voice together.
+
+| Home & check-ins | Medicines |
+| --- | --- |
+| ![Home screen](docs/images/01-home.png) | ![Medicines](docs/images/02-medicines.png) |
+
+| Companion chat | Family monitor |
+| --- | --- |
+| ![Chat](docs/images/03-chat.png) | ![Family monitor](docs/images/04-family-monitor.png) |
+
+| Phone — home | Phone — drawer |
+| --- | --- |
+| ![Phone home](docs/images/05-phone-home.png) | ![Phone drawer](docs/images/06-phone-drawer.png) |
+
+---
+
 ## Run it
 
 One command. No Docker, no Node toolchain, no system packages.
@@ -163,6 +196,7 @@ backend/app/            ai.py (model chains) · auth.py · main.py (52 endpoints
 backend/tests/          209 tests
 frontend/src/           App.jsx · components/ · lib/i18n.js (252 keys × 9)
 docs/WORKING.md         the full feature blueprint and build log
+docs/images/            the screenshots above
 ```
 
 ---
