@@ -331,7 +331,7 @@ export function PasswordSection({ t, user }) {
 
 export function SettingsPanel({ t, lang, setLang, theme, setTheme, voiceOut,
   setVoiceOut, onClose, user, onAuthed, onSignOut,
-  schedule, onSaveSchedule }) {
+  schedule, onSaveSchedule, health }) {
   return (
     <Panel title={t('settings')} onClose={onClose}>
       <div className="col">
@@ -368,6 +368,18 @@ export function SettingsPanel({ t, lang, setLang, theme, setTheme, voiceOut,
 
         <AccountSection t={t} user={user} onAuthed={onAuthed}
                         onSignOut={onSignOut} />
+
+        <div className="hr" />
+
+        <div className="small muted">Saavren · v{health?.version || '—'}</div>
+        <div className="small muted">
+          {t('model')}: {health?.baseten_model || '—'} · Baseten → Groq
+        </div>
+        <div className="small muted">
+          ASR: {health?.asr_chain?.join(' → ') || health?.asr_mode || '—'}
+          {health && !health.asr_chain?.includes('mms')
+            ? ' — MMS needs HF token' : ''}
+        </div>
       </div>
     </Panel>
   )

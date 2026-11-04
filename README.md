@@ -109,15 +109,17 @@ Two Meta open-weight models, front and centre:
 
 | Job | Model |
 |---|---|
-| Speech → text | **Meta MMS** `facebook/mms-1b-all` via the HF router |
-| Reasoning | **Muse Spark Open** `meta-models/muse-spark-open` (816B-A42B MoE, multimodal) on Baseten |
+| Speech → text | **Meta MMS** `facebook/mms-1b-all` via the HF router <br>*(wired; inactive without an HF token — Groq whisper carries the live demo)* |
+| Reasoning | **Muse Spark Open** `meta-models/muse-spark-open` (816B-A42B MoE, multimodal) on Baseten <br>*(live — `/api/ai-status?probe=1` reports Baseten OK)* |
 
 Each has a fallback chain that is exercised, not theoretical:
 
 ```
 reasoning : Baseten (Muse Spark Open) → Groq (gpt-oss-120b → qwen3.6-27b → gpt-oss-20b)
           → HF router (opt-in; free accounts have no provider credits) → offline mirror
-speech    : MMS via HF router → Groq whisper-large-v3-turbo → browser Web Speech API
+speech    : MMS via HF router (inactive: needs HF provider credits)
+          → Groq whisper-large-v3-turbo (what the live demo uses)
+          → browser Web Speech API
 ```
 
 ### Graceful degradation
@@ -213,6 +215,12 @@ docs/images/            the screenshots above
   net, not a medical device, and it does not replace a wearable.
 - The agent's medical guidance is explicitly not a doctor's advice; every
   health answer says so.
+- **Meta MMS never runs on the live demo.** The ASR chain tries
+  `facebook/mms-1b-all` first only when `HF_TOKEN` is set **and** the account has
+  Inference Provider credits — free HF accounts get none, and the providers the
+  router would use are paid. With no token the chain *skips* MMS silently, it
+  does not fail over to it: `/api/health` on the live site reports
+  `asr_chain: ["groq"]` and `hf_token: "missing"`.
 - **Emergency dispatch is simulated.** An SOS or an unanswered fall raises an
   alert, writes it to the family feed and builds the hospital packet with the
   nearest three hospitals. It does not place a call, send an SMS or fire a
@@ -232,8 +240,9 @@ Built and runs today:
   revocation on password change, stored in SQLite.
 - Acoustic fall detection on the live microphone stream, with an "are you OK?"
   countdown the elder can cancel.
-- The triage conversation — browser speech-to-text, Meta MMS ASR, Muse Spark
-  Open on Baseten with a Groq fallback, and spoken replies.
+- The triage conversation — spoken input transcribed by Groq
+  whisper-large-v3-turbo, reasoning by Muse Spark Open on Baseten with a Groq
+  model fallback, and spoken replies.
 - Medicine schedule, check-ins, adherence points and the incident timeline,
   held in one in-memory store.
 - The hospital packet — nearest three hospitals from OpenStreetMap Nominatim,
@@ -243,6 +252,13 @@ Simulated on purpose:
 
 - Emergency dispatch. Nothing leaves the server. See Honest limits.
 - The shared demo store above.
+
+Wired but inactive:
+
+- Meta MMS `facebook/mms-1b-all` — the ASR chain tries it first when
+  `HF_TOKEN` is set **and** the account has Inference Provider credits. Neither
+  is true on the demo deployment, so the chain skips it silently and Groq
+  whisper carries every transcription.
 
 Not built, though `docs/WORKING.md` describes it: OTP login, invite codes,
 bcrypt, and the friend-mode small talk. That file is a blueprint, not a

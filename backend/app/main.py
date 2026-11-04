@@ -375,6 +375,7 @@ def health():
     return {"ok": True, "service": "saavren", "version": app.version,
             "asr": ai.asr_available(), "asr_mode": ai.asr_mode(),
             "asr_chain": ai.asr_chain(),
+            "baseten_model": ai.BASETEN_MODEL,
             "hf_token": ai.hf_token_status()[1],
             "ffmpeg_ready": ai.ffmpeg_bin() is not None,
             "ffmpeg_required": False,

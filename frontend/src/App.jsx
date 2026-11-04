@@ -892,7 +892,7 @@ export default function App() {
       {panel === 'settings' && (
         <SettingsPanel t={t} lang={lang} setLang={setLang} theme={theme}
                        setTheme={setTheme} voiceOut={voiceOut} setVoiceOut={setVoiceOut}
-                       onClose={() => setPanel(null)} user={user}
+                       onClose={() => setPanel(null)} user={user} health={health}
                        onAuthed={onAuthed} onSignOut={onSignOut}
                        schedule={state?.checkin_schedule}
                        onSaveSchedule={saveSchedule} />

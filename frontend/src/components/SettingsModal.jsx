@@ -8,7 +8,7 @@ export default function SettingsModal({
     <div className="modal" onClick={onClose}>
       <div className="sheet" onClick={(e) => e.stopPropagation()}>
         <h3>⚙️ {t('settings')}</h3>
-        <div className="sub">Saavren · v0.2.0 (dev build)</div>
+        <div className="sub">Saavren · v{health?.version || '—'}</div>
 
         <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 6 }}>{t('theme')}</div>
         <div className="seg" style={{ marginBottom: 16 }}>
@@ -48,9 +48,11 @@ export default function SettingsModal({
         </div>
 
         <div style={{ marginTop: 16, borderTop: '1px solid var(--border)', paddingTop: 10 }}>
-          <div className="kv"><span>{t('model')}</span><span>Llama (Meta) · Baseten → Groq</span></div>
+          <div className="kv"><span>{t('model')}</span><span>{health?.baseten_model || '—'} · Baseten → Groq</span></div>
           <div className="kv"><span>{t('source')}</span><span>{health?.provider_order?.join(' → ') || '—'}</span></div>
-          <div className="kv"><span>ASR</span><span>{health?.asr_model || '—'}</span></div>
+          <div className="kv"><span>ASR</span><span>{health?.asr_chain?.join(' → ') || health?.asr_mode || '—'}{health && !health.asr_chain?.includes('mms') && (
+            <span style={{ opacity: 0.55 }}> — MMS needs HF token</span>
+          )}</span></div>
           <div className="kv"><span>ffmpeg</span><span>{health ? (health.ffmpeg_ready ? 'available' : 'not needed (browser WAV)') : '—'}</span></div>
         </div>
 
