@@ -28,7 +28,7 @@ because the person who needs it most will not type.
 | --- | --- |
 | **Live demo** | <https://saavren.onrender.com> — opens in any browser, nothing to install |
 | **Android APK** | [Download the APK](https://github.com/OMtheMAKER/saavren/releases/latest) — Android 7.0+, allow "Unknown sources" |
-| **Demo video** | [Watch the 2-minute walkthrough](https://youtu.be/5X5oRt5ci6g) |
+| **Demo video** | [Watch the 2-minute walkthrough](https://youtu.be/ScmBgk5WOXY) |
 
 The live demo and the APK run the same build. Render's free tier sleeps when
 idle, so give the first load about 30 seconds to wake up.
